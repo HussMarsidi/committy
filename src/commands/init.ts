@@ -1,0 +1,90 @@
+import fs from "node:fs";
+import path from "node:path";
+import { createDefaultConfig } from "../config/defaults.js";
+import type { GcConfig, GcScope } from "../config/types.js";
+import { detectRepo } from "../git/repo.js";
+import {
+  PromptCancelledError,
+  promptConfirm,
+  promptInput,
+  promptSelect,
+} from "../prompt/commit-prompt.js";
+
+async function collectScopes(): Promise<GcScope[]> {
+  const scopes: GcScope[] = [];
+
+  while (true) {
+    const name = (await promptInput("Scope name")).trim();
+    if (!name) {
+      console.log("Scope name is required.");
+      continue;
+    }
+
+    const team = (await promptInput("Team prefix (optional, press Enter to skip)")).trim();
+    scopes.push(team ? { name, team } : { name });
+
+    const addAnother = await promptConfirm("Add another scope?");
+    if (!addAnother) {
+      break;
+    }
+  }
+
+  return scopes;
+}
+
+export async function runInitCommand(): Promise<void> {
+  try {
+    const { isAtRoot } = detectRepo();
+
+    if (!isAtRoot) {
+      const proceed = await promptConfirm(
+        "Not at repo root. Write .gc.json here anyway?",
+      );
+      if (!proceed) {
+        process.exit(0);
+      }
+    }
+
+    const targetPath = path.join(process.cwd(), ".gc.json");
+
+    if (fs.existsSync(targetPath)) {
+      const overwrite = await promptConfirm(".gc.json already exists. Overwrite?");
+      if (!overwrite) {
+        process.exit(0);
+      }
+    }
+
+    const addDefaults = await promptConfirm("Add default conventional commit types?");
+    const scopesChoice = await promptSelect<"now" | "later">(
+      "Add scopes now or later?",
+      [
+        { name: "Now", value: "now" },
+        { name: "Later", value: "later" },
+      ],
+    );
+
+    let config: GcConfig;
+
+    if (addDefaults) {
+      config = createDefaultConfig();
+    } else {
+      config = { types: [], scopes: [] };
+    }
+
+    if (!addDefaults) {
+      console.log("Add at least one type in .gc.json before using gcv with config.");
+    }
+
+    if (scopesChoice === "now") {
+      config.scopes = await collectScopes();
+    }
+
+    fs.writeFileSync(targetPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+    console.log(`Created ${targetPath}`);
+  } catch (error) {
+    if (error instanceof PromptCancelledError) {
+      process.exit(0);
+    }
+    throw error;
+  }
+}
