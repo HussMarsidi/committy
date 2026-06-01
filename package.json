@@ -1,0 +1,37 @@
+{
+  "name": "konven",
+  "version": "0.1.0",
+  "description": "A lightweight global CLI for enforcing git commit conventions",
+  "bin": {
+    "gcv": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "git",
+    "commit",
+    "conventional-commits",
+    "cli"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/prompts": "^7.5.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
