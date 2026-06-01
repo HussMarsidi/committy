@@ -10,6 +10,32 @@ import {
   promptSelect,
 } from "../prompt/commit-prompt.js";
 
+async function collectTypes(): Promise<string[]> {
+  const types: string[] = [];
+
+  while (true) {
+    const name = (await promptInput("Commit type")).trim();
+    if (!name) {
+      console.log("Type name is required.");
+      continue;
+    }
+
+    if (types.includes(name)) {
+      console.log(`Type "${name}" already added.`);
+      continue;
+    }
+
+    types.push(name);
+
+    const addAnother = await promptConfirm("Add another type?");
+    if (!addAnother) {
+      break;
+    }
+  }
+
+  return types;
+}
+
 async function collectScopes(): Promise<GcScope[]> {
   const scopes: GcScope[] = [];
 
@@ -68,11 +94,8 @@ export async function runInitCommand(): Promise<void> {
     if (addDefaults) {
       config = createDefaultConfig();
     } else {
-      config = { types: [], scopes: [] };
-    }
-
-    if (!addDefaults) {
-      console.log("Add at least one type in .gc.json before using gcv with config.");
+      const types = await collectTypes();
+      config = { types, scopes: [] };
     }
 
     if (scopesChoice === "now") {
