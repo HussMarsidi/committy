@@ -21,6 +21,7 @@ jobs:
         with:
           node-version: "22.15.1"
           registry-url: "https://registry.npmjs.org"
+          always-auth: true
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
