@@ -1,3 +1,5 @@
+[![CI](https://github.com/HussMarsidi/committy/actions/workflows/ci.yml/badge.svg)](https://github.com/HussMarsidi/committy/actions/workflows/ci.yml)
+
 # committy (`gcv`)
 
 A lightweight global CLI for conventional commits. Install once, use in any repo. No project config required.
