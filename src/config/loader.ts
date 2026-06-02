@@ -2,7 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { DEFAULT_TYPES } from "./defaults.js";
 import { buildConfigIndexes, emptyConfigIndexes } from "./indexes.js";
-import { ConfigError, type ConfigIndexes, type GcConfig, type LoadedConfig } from "./types.js";
+import {
+  ConfigError,
+  type ConfigIndexes,
+  type GcBranchConfig,
+  type GcConfig,
+  type LoadedConfig,
+} from "./types.js";
 import { detectRepo } from "../git/repo.js";
 
 const CONFIG_FILENAME = ".gc.json";
@@ -76,9 +82,48 @@ export function parseAndValidateConfig(raw: unknown, filePath: string): GcConfig
     });
   }
 
+  const branches = parseBranchesSection(raw, filePath);
+
   return {
     types: types as string[],
     scopes: parsedScopes,
+    ...(branches !== undefined ? { branches } : {}),
+  };
+}
+
+function parseStringArray(
+  value: unknown,
+  filePath: string,
+  field: string,
+): string[] {
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new ConfigError(filePath, `${field} must be a non-empty array of strings`);
+  }
+
+  if (!value.every((item) => typeof item === "string" && item.length > 0)) {
+    throw new ConfigError(filePath, `${field} must be a non-empty array of strings`);
+  }
+
+  return value as string[];
+}
+
+function parseBranchesSection(
+  raw: Record<string, unknown>,
+  filePath: string,
+): GcBranchConfig | undefined {
+  if (raw.branches === undefined) {
+    return undefined;
+  }
+
+  if (!isRecord(raw.branches)) {
+    throw new ConfigError(filePath, "branches must be an object");
+  }
+
+  const { allowed, types } = raw.branches;
+
+  return {
+    allowed: parseStringArray(allowed, filePath, "branches.allowed"),
+    types: parseStringArray(types, filePath, "branches.types"),
   };
 }
 

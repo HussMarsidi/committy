@@ -5,6 +5,7 @@ vi.mock("node:child_process", () => ({
   execSync: vi.fn(),
 }));
 
+import { runGitBranch } from "./branch.js";
 import { runGitCommit } from "./commit.js";
 import { hasStagedFiles } from "./staged.js";
 
@@ -28,6 +29,20 @@ describe("hasStagedFiles", () => {
       throw err;
     });
     expect(hasStagedFiles()).toBe(true);
+  });
+});
+
+describe("runGitBranch", () => {
+  beforeEach(() => {
+    vi.mocked(execSync).mockReset();
+    vi.mocked(execSync).mockReturnValue(Buffer.from(""));
+  });
+
+  it("runs git switch -c with quoted branch name", () => {
+    runGitBranch("feat/add-login");
+    expect(execSync).toHaveBeenCalledWith('git switch -c "feat/add-login"', {
+      stdio: "inherit",
+    });
   });
 });
 

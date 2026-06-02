@@ -15,8 +15,12 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_TYPES } from "../config/defaults.js";
-import type { GcConfig } from "../config/types.js";
+import {
+  DEFAULT_BRANCH_PATTERNS,
+  DEFAULT_BRANCH_TYPES,
+  DEFAULT_TYPES,
+} from "../config/defaults.js";
+import type { GcBranchConfig, GcConfig } from "../config/types.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -115,6 +119,20 @@ function readGcConfig(dir: string): GcConfig {
   return JSON.parse(readFileSync(join(dir, ".gc.json"), "utf8")) as GcConfig;
 }
 
+function writeGcConfig(dir: string, config: GcConfig): void {
+  writeFileSync(join(dir, ".gc.json"), `${JSON.stringify(config, null, 2)}\n`);
+}
+
+const SKIP_BRANCH_AND_HOOKS: InitStep[] = [
+  { when: "Add branch naming conventions? (y/N)", value: "n" },
+  { when: "Install git hooks for branch validation? (y/N)", value: "n" },
+];
+
+const defaultBranchConfig: GcBranchConfig = {
+  allowed: [...DEFAULT_BRANCH_PATTERNS],
+  types: [...DEFAULT_BRANCH_TYPES],
+};
+
 const temps: string[] = [];
 
 /** Create a temp git repo, optionally with a staged file ready to commit. */
@@ -128,6 +146,13 @@ function tempRepo(staged = true): string {
     writeFileSync(join(dir, "a.txt"), "hello");
     execSync("git add a.txt", { cwd: dir, stdio: "pipe" });
   }
+  return dir;
+}
+
+/** Git repo with at least one commit (required for `git switch -c`). */
+function tempRepoWithCommit(): string {
+  const dir = tempRepo();
+  execSync('git commit -m "init"', { cwd: dir, stdio: "pipe" });
   return dir;
 }
 
@@ -205,6 +230,7 @@ describe("gcv init", () => {
     const { exitCode, stdout } = await runInitInteractive(dir, [
       { when: "Add default conventional commit types? (y/N)", value: "y" },
       { when: "Add scopes now? (y/N)", value: "n" },
+      ...SKIP_BRANCH_AND_HOOKS,
     ]);
     expect(exitCode).toBe(0);
     expect(stdout).toContain("Created");
@@ -222,6 +248,7 @@ describe("gcv init", () => {
       { when: "Scope name", value: "auth" },
       { when: "Team prefix (optional, press Enter to skip)", value: "" },
       { when: "Add another scope? (y/N)", value: "n" },
+      ...SKIP_BRANCH_AND_HOOKS,
     ]);
     expect(exitCode).toBe(0);
     expect(readGcConfig(dir)).toEqual({
@@ -237,6 +264,7 @@ describe("gcv init", () => {
       { when: "Add scopes now? (y/N)", value: "n" },
       { when: "Commit type", value: "feat" },
       { when: "Add another type? (y/N)", value: "n" },
+      ...SKIP_BRANCH_AND_HOOKS,
     ]);
     expect(exitCode).toBe(0);
     expect(readGcConfig(dir)).toEqual({
@@ -255,6 +283,7 @@ describe("gcv init", () => {
       { when: "Scope name", value: "auth" },
       { when: "Team prefix (optional, press Enter to skip)", value: "PCUST" },
       { when: "Add another scope? (y/N)", value: "n" },
+      ...SKIP_BRANCH_AND_HOOKS,
     ]);
     expect(exitCode).toBe(0);
     expect(readGcConfig(dir)).toEqual({
@@ -275,6 +304,7 @@ describe("gcv init", () => {
       { when: ".gc.json already exists. Overwrite? (y/N)", value: "y" },
       { when: "Add default conventional commit types? (y/N)", value: "y" },
       { when: "Add scopes now? (y/N)", value: "n" },
+      ...SKIP_BRANCH_AND_HOOKS,
     ]);
     expect(exitCode).toBe(0);
     expect(readGcConfig(dir).types).toEqual([...DEFAULT_TYPES]);
@@ -306,6 +336,7 @@ describe("gcv init", () => {
       },
       { when: "Add default conventional commit types? (y/N)", value: "y" },
       { when: "Add scopes now? (y/N)", value: "n" },
+      ...SKIP_BRANCH_AND_HOOKS,
     ]);
     expect(exitCode).toBe(0);
     expect(stdout).toContain(join(sub, ".gc.json"));
@@ -327,6 +358,222 @@ describe("gcv init", () => {
     expect(exitCode).toBe(0);
     expect(stdout).not.toContain("Created");
     expect(() => readFileSync(join(sub, ".gc.json"))).toThrow();
+  });
+});
+
+describe("gcv init — branches", () => {
+  it("writes branches section with defaults when user opts in", async () => {
+    const dir = tempRepo(false);
+    const { exitCode } = await runInitInteractive(dir, [
+      { when: "Add default conventional commit types? (y/N)", value: "y" },
+      { when: "Add scopes now? (y/N)", value: "n" },
+      { when: "Add branch naming conventions? (y/N)", value: "y" },
+      { when: "Add default branch types? (y/N)", value: "y" },
+      { when: "Add custom patterns? (y/N)", value: "n" },
+      { when: "Install git hooks for branch validation? (y/N)", value: "n" },
+    ]);
+    expect(exitCode).toBe(0);
+    expect(readGcConfig(dir).branches).toEqual(defaultBranchConfig);
+  });
+
+  it("writes branches section with custom types and patterns", async () => {
+    const dir = tempRepo(false);
+    const { exitCode } = await runInitInteractive(dir, [
+      { when: "Add default conventional commit types? (y/N)", value: "y" },
+      { when: "Add scopes now? (y/N)", value: "n" },
+      { when: "Add branch naming conventions? (y/N)", value: "y" },
+      { when: "Add default branch types? (y/N)", value: "n" },
+      { when: "Branch type", value: "feat" },
+      { when: "Add another branch type? (y/N)", value: "n" },
+      { when: "Add custom patterns? (y/N)", value: "y" },
+      { when: "Branch pattern (e.g. {type}/{description})", value: "{type}/{description}" },
+      { when: "Add another pattern? (y/N)", value: "n" },
+      { when: "Install git hooks for branch validation? (y/N)", value: "n" },
+    ]);
+    expect(exitCode).toBe(0);
+    expect(readGcConfig(dir).branches).toEqual({
+      types: ["feat"],
+      allowed: ["{type}/{description}"],
+    });
+  });
+
+  it("skips branches section when user declines", async () => {
+    const dir = tempRepo(false);
+    const { exitCode } = await runInitInteractive(dir, [
+      { when: "Add default conventional commit types? (y/N)", value: "y" },
+      { when: "Add scopes now? (y/N)", value: "n" },
+      { when: "Add branch naming conventions? (y/N)", value: "n" },
+      { when: "Install git hooks for branch validation? (y/N)", value: "n" },
+    ]);
+    expect(exitCode).toBe(0);
+    expect(readGcConfig(dir).branches).toBeUndefined();
+  });
+
+  it("installs hooks (no-husky path) when user opts in", async () => {
+    const dir = tempRepo(false);
+    const { exitCode, stdout } = await runInitInteractive(dir, [
+      { when: "Add default conventional commit types? (y/N)", value: "y" },
+      { when: "Add scopes now? (y/N)", value: "n" },
+      ...SKIP_BRANCH_AND_HOOKS.slice(0, 1),
+      { when: "Install git hooks for branch validation? (y/N)", value: "y" },
+    ]);
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain("core.hooksPath");
+    expect(readFileSync(join(dir, ".gc/hooks/post-checkout"), "utf8")).toContain(
+      "gcv branch validate",
+    );
+  });
+
+  it("appends to .husky/post-checkout when husky is detected", async () => {
+    const dir = tempRepo(false);
+    mkdirSync(join(dir, ".husky"));
+    writeFileSync(
+      join(dir, "package.json"),
+      `${JSON.stringify({ devDependencies: { husky: "^9.0.0" } }, null, 2)}\n`,
+    );
+
+    const { exitCode, stdout } = await runInitInteractive(dir, [
+      { when: "Add default conventional commit types? (y/N)", value: "y" },
+      { when: "Add scopes now? (y/N)", value: "n" },
+      ...SKIP_BRANCH_AND_HOOKS.slice(0, 1),
+      { when: "Install git hooks for branch validation? (y/N)", value: "y" },
+    ]);
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain("husky delegation");
+    const huskyHook = readFileSync(join(dir, ".husky/post-checkout"), "utf8");
+    expect(huskyHook).toContain('sh .gc/hooks/post-checkout "$@"');
+  });
+
+  it("does not install hooks when user declines", async () => {
+    const dir = tempRepo(false);
+    await runInitInteractive(dir, [
+      { when: "Add default conventional commit types? (y/N)", value: "y" },
+      { when: "Add scopes now? (y/N)", value: "n" },
+      ...SKIP_BRANCH_AND_HOOKS,
+    ]);
+    expect(() => readFileSync(join(dir, ".gc/hooks/post-checkout"))).toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// gcv branch validate
+// ---------------------------------------------------------------------------
+
+describe("gcv branch validate", () => {
+  function repoWithBranches(): string {
+    const dir = tempRepo(false);
+    writeGcConfig(dir, {
+      types: ["feat"],
+      scopes: [],
+      branches: defaultBranchConfig,
+    });
+    return dir;
+  }
+
+  it("exits 0 for a valid branch name matching the first pattern", async () => {
+    const dir = repoWithBranches();
+    const { exitCode, stdout } = await run(["branch", "validate", "feat/add-login"], dir);
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain("Valid branch name");
+  });
+
+  it("exits 0 for a valid branch name matching the ticket pattern", async () => {
+    const dir = repoWithBranches();
+    const { exitCode } = await run(["branch", "validate", "feat/PROJ-123-add-login"], dir);
+    expect(exitCode).toBe(0);
+  });
+
+  it("exits 1 for a branch name that matches no pattern", async () => {
+    const dir = repoWithBranches();
+    const { exitCode, stderr } = await run(["branch", "validate", "wip/add-login"], dir);
+    expect(exitCode).toBe(1);
+    expect(stderr).toContain("does not match");
+  });
+
+  it("exits 1 when type not in allowed types", async () => {
+    const dir = tempRepo(false);
+    writeGcConfig(dir, {
+      types: ["feat"],
+      scopes: [],
+      branches: {
+        allowed: ["{type}/{description}"],
+        types: ["feat", "fix"],
+      },
+    });
+    const { exitCode } = await run(["branch", "validate", "release/add-login"], dir);
+    expect(exitCode).toBe(1);
+  });
+
+  it("exits 0 with a warning when no branches config is present", async () => {
+    const dir = tempRepo(false);
+    const { exitCode, stdout } = await run(["branch", "validate", "feat/foo"], dir);
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain("validation skipped");
+  });
+
+  it("exits 1 when validate is called without a branch name", async () => {
+    const dir = repoWithBranches();
+    const { exitCode, stderr } = await run(["branch", "validate"], dir);
+    expect(exitCode).toBe(1);
+    expect(stderr).toContain("requires a branch name");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// gcv branch inline (create)
+// ---------------------------------------------------------------------------
+
+describe("gcv branch inline", () => {
+  it("creates the branch when name is valid", async () => {
+    const dir = tempRepoWithCommit();
+    writeGcConfig(dir, {
+      types: ["feat"],
+      scopes: [],
+      branches: defaultBranchConfig,
+    });
+    const { exitCode } = await run(["branch", "feat/add-login"], dir);
+    expect(exitCode).toBe(0);
+    const branches = execSync('git for-each-ref --format="%(refname:short)" refs/heads/', {
+      cwd: dir,
+    })
+      .toString()
+      .trim()
+      .split("\n")
+      .filter(Boolean);
+    expect(branches).toContain("feat/add-login");
+  });
+
+  it("exits 1 and does not create branch when name is invalid", async () => {
+    const dir = tempRepoWithCommit();
+    writeGcConfig(dir, {
+      types: ["feat"],
+      scopes: [],
+      branches: defaultBranchConfig,
+    });
+    const { exitCode } = await run(["branch", "wip/add-login"], dir);
+    expect(exitCode).toBe(1);
+    const branches = execSync('git for-each-ref --format="%(refname:short)" refs/heads/', {
+      cwd: dir,
+    })
+      .toString()
+      .trim()
+      .split("\n")
+      .filter(Boolean);
+    expect(branches).not.toContain("wip/add-login");
+  });
+
+  it("creates branch without validation when no branches config present", async () => {
+    const dir = tempRepoWithCommit();
+    const { exitCode } = await run(["branch", "experiment/test"], dir);
+    expect(exitCode).toBe(0);
+    const branches = execSync('git for-each-ref --format="%(refname:short)" refs/heads/', {
+      cwd: dir,
+    })
+      .toString()
+      .trim()
+      .split("\n")
+      .filter(Boolean);
+    expect(branches).toContain("experiment/test");
   });
 });
 

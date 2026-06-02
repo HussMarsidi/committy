@@ -2,6 +2,7 @@
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { runBranchCommand } from "./commands/branch.js";
 import { runCommitCommand } from "./commands/commit.js";
 import { runInitCommand } from "./commands/init.js";
 
@@ -12,8 +13,14 @@ A lightweight global CLI for enforcing git commit conventions.
 Commands:
   gcv              Interactive commit prompt
   gcv init         Scaffold .gc.json in current directory
+  gcv branch       Create or validate a branch name
   gcv --help       Show this help
   gcv --version    Show version
+
+Branch:
+  gcv branch                         Interactive branch creator
+  gcv branch <name>                  Create branch (validates when configured)
+  gcv branch validate <name>       Validate branch name only
 
 Inline mode:
   gcv <type> [scope] <message...>
@@ -45,7 +52,7 @@ function printHelp(): void {
 }
 
 function parseArgs(argv: string[]): {
-  command: "help" | "version" | "init" | "commit";
+  command: "help" | "version" | "init" | "commit" | "branch";
   inlineArgs: string[];
 } {
   if (argv.length === 0) {
@@ -64,6 +71,10 @@ function parseArgs(argv: string[]): {
 
   if (first === "init") {
     return { command: "init", inlineArgs: rest };
+  }
+
+  if (first === "branch") {
+    return { command: "branch", inlineArgs: rest };
   }
 
   if (first.startsWith("-")) {
@@ -91,6 +102,9 @@ async function main(): Promise<void> {
         process.exit(1);
       }
       await runInitCommand();
+      break;
+    case "branch":
+      await runBranchCommand(inlineArgs);
       break;
     case "commit":
       await runCommitCommand(inlineArgs);
