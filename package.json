@@ -18,6 +18,12 @@
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "changelog": "node dist/index.js changelog",
     "changelog:dry": "node dist/index.js changelog --dry-run",
+    "bump": "node dist/index.js bump",
+    "bump:minor": "node dist/index.js bump --minor",
+    "bump:major": "node dist/index.js bump --major",
+    "bump:patch": "node dist/index.js bump --patch",
+    "bump:dry": "node dist/index.js bump --dry-run",
+    "bump:no-tag": "node dist/index.js bump --no-tag",
     "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
