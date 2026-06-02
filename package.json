@@ -28,10 +28,13 @@
   "dependencies": {
     "@inquirer/prompts": "^7.5.3",
     "conventional-changelog": "^7.2.0",
-    "conventional-changelog-conventionalcommits": "^9.3.1"
+    "conventional-changelog-conventionalcommits": "^9.3.1",
+    "conventional-recommended-bump": "^11.2.0",
+    "semver": "^7.8.1"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
+    "@types/semver": "^7.7.1",
     "execa": "^9.5.2",
     "typescript": "^5.8.3",
     "vitest": "^3.1.4"
