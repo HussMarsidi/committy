@@ -3,6 +3,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { runBranchCommand } from "./commands/branch.js";
+import { runBumpCommand } from "./commands/bump.js";
 import { runChangelogCommand } from "./commands/changelog.js";
 import { runCommitCommand } from "./commands/commit.js";
 import { runInitCommand } from "./commands/init.js";
@@ -16,6 +17,7 @@ Commands:
   gcv init                     Scaffold .gc.json in current directory
   gcv branch                   Create or validate a branch name
   gcv changelog                Generate CHANGELOG.md from git history
+  gcv bump                     Bump version, update changelog, commit and tag
   gcv --help                   Show this help
   gcv --version                Show version
 
@@ -24,6 +26,14 @@ Changelog:
   gcv changelog --dry-run      Print to stdout, no file written
   gcv changelog --from v1.0.0  Generate from a specific tag
   gcv changelog --all          Regenerate entire changelog from scratch
+
+Bump:
+  gcv bump                     Auto-detect bump type from commits
+  gcv bump --major             Override to major
+  gcv bump --minor             Override to minor
+  gcv bump --patch             Override to patch
+  gcv bump --dry-run           Show what would happen, no writes
+  gcv bump --no-tag            Bump and changelog but skip git tag
 
 Branch:
   gcv branch                         Interactive branch creator
@@ -60,7 +70,7 @@ function printHelp(): void {
 }
 
 function parseArgs(argv: string[]): {
-  command: "help" | "version" | "init" | "commit" | "branch" | "changelog";
+  command: "help" | "version" | "init" | "commit" | "branch" | "changelog" | "bump";
   inlineArgs: string[];
 } {
   if (argv.length === 0) {
@@ -87,6 +97,10 @@ function parseArgs(argv: string[]): {
 
   if (first === "changelog") {
     return { command: "changelog", inlineArgs: rest };
+  }
+
+  if (first === "bump") {
+    return { command: "bump", inlineArgs: rest };
   }
 
   if (first.startsWith("-")) {
@@ -120,6 +134,9 @@ async function main(): Promise<void> {
       break;
     case "changelog":
       await runChangelogCommand(inlineArgs);
+      break;
+    case "bump":
+      await runBumpCommand(inlineArgs);
       break;
     case "commit":
       await runCommitCommand(inlineArgs);
