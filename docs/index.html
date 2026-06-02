@@ -259,6 +259,11 @@
       border-color: var(--accent);
     }
 
+    .milestone.wip .milestone-dot {
+      background: #e3b341;
+      border-color: #e3b341;
+    }
+
     .milestone-header {
       display: flex;
       align-items: center;
@@ -295,6 +300,12 @@
       background: var(--tag-upcoming);
       color: var(--muted);
       border: 1px solid #333;
+    }
+
+    .tag-wip {
+      background: #2d2500;
+      color: #e3b341;
+      border: 1px solid #4a3c00;
     }
 
     .milestone-items {
@@ -516,26 +527,26 @@
         </ul>
       </div>
 
-      <div class="milestone">
+      <div class="milestone done">
         <div class="milestone-dot"></div>
         <div class="milestone-header">
           <span class="milestone-version">v0.2</span>
           <span class="milestone-title">Branch convention</span>
-          <span class="tag tag-upcoming">Upcoming</span>
+          <span class="tag tag-done">Launched</span>
         </div>
         <ul class="milestone-items">
-          <li><code>gcv branch</code> — interactive + inline</li>
-          <li>Branch pattern validation against <code>allowed</code> config</li>
-          <li><code>gcv init</code> extended with branches section</li>
+          <li><code>gcv branch</code> — interactive creator, inline create, <code>validate</code> subcommand</li>
+          <li>Branch pattern validation against <code>branches</code> config in <code>.gc.json</code></li>
+          <li><code>gcv init</code> — optional branches section and git hook installation (Husky or <code>core.hooksPath</code>)</li>
         </ul>
       </div>
 
-      <div class="milestone">
+      <div class="milestone wip">
         <div class="milestone-dot"></div>
         <div class="milestone-header">
           <span class="milestone-version">v0.3</span>
           <span class="milestone-title">Changelog</span>
-          <span class="tag tag-upcoming">Upcoming</span>
+          <span class="tag tag-wip">In progress</span>
         </div>
         <ul class="milestone-items">
           <li><code>gcv changelog</code> — generates from git log</li>
@@ -623,10 +634,59 @@ gcv fix update readme
     </div>
 
     <div class="doc-section">
+      <h3>Branch — interactive</h3>
+      <p>Run <code>gcv branch</code> with no arguments to open the guided branch name builder. It reads your <code>branches</code> config, prompts for each placeholder in the selected pattern, and runs <code>git switch -c</code> with the validated name.</p>
+      <pre><code>gcv branch
+
+<span class="comment"># Prompt (using pattern "{type}/{description}"):</span>
+<span class="cmd-output">? Pattern:     {type}/{description}
+? Type:        feat
+? Description: add-login-page</span>
+
+<span class="comment"># Result:</span>
+<span class="cmd-output">git switch -c feat/add-login-page</span></code></pre>
+      <p>If your config has multiple patterns you'll be asked to pick one first. Description input is auto-kebab-cased — spaces become hyphens, uppercase is lowered.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>Branch — inline</h3>
+      <p>Pass the full branch name directly to skip the prompt. committy validates it against your config before creating the branch.</p>
+      <pre><code><span class="comment"># Inline create — validates then runs git switch -c</span>
+gcv branch feat/add-login-page
+<span class="cmd-output">→ git switch -c feat/add-login-page</span>
+
+<span class="comment"># With ticket pattern</span>
+gcv branch feat/PROJ-123-add-login-page
+<span class="cmd-output">→ git switch -c feat/PROJ-123-add-login-page</span>
+
+<span class="comment"># Validate only — exits 0 or 1, no branch created</span>
+gcv branch validate feat/add-login-page</code></pre>
+      <p>If no <code>branches</code> config is present, inline create still works — it just skips validation.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>Branch — git hooks</h3>
+      <p>During <code>gcv init</code>, you can install a <code>post-checkout</code> hook that validates branch names automatically — even when someone bypasses <code>gcv branch</code> and uses <code>git switch</code> directly.</p>
+      <p>committy detects your setup and adapts:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Environment</th><th>What gets written</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>No Husky</td><td><code>.gc/hooks/post-checkout</code> + <code>prepare</code> script sets <code>core.hooksPath</code></td></tr>
+            <tr><td>Husky detected</td><td><code>.gc/hooks/post-checkout</code> + delegation line appended to <code>.husky/post-checkout</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Commit the <code>.gc/hooks/</code> directory. Every developer who runs <code>npm install</code> after the PR merges gets the hooks wired up automatically. If <code>gcv</code> isn't installed, the hook prints a warning and exits cleanly — it never breaks the workflow.</p>
+    </div>
+
+    <div class="doc-section">
       <h3>Init — set up a team config</h3>
-      <p>Run <code>gcv init</code> to scaffold a <code>.gc.json</code> in the current directory. Commit this file so the whole team shares the same types and scopes.</p>
+      <p>Run <code>gcv init</code> to scaffold a <code>.gc.json</code> in the current directory. Commit this file so the whole team shares the same types, scopes, and branch rules.</p>
       <pre><code>gcv init</code></pre>
-      <p>If you're not at the repo root, committy warns you before writing. If <code>.gc.json</code> already exists, it asks before overwriting.</p>
+      <p>If you're not at the repo root, committy warns you before writing. If <code>.gc.json</code> already exists, it asks before overwriting. v0.2 adds two new optional steps: branch config and hook installation.</p>
     </div>
 
     <div class="doc-section">
@@ -639,7 +699,11 @@ gcv fix update readme
     { "name": "payment", "team": "PCUST" },
     { "name": "dashboard", "team": "PINT" },
     { "name": "deps" }
-  ]
+  ],
+  "branches": {
+    "allowed": ["{type}/{description}", "{type}/{ticket}-{description}"],
+    "types": ["feat", "fix", "hotfix", "release", "chore"]
+  }
 }</code></pre>
 
       <div class="table-wrap">
@@ -652,9 +716,13 @@ gcv fix update readme
             <tr><td>scopes</td><td>object[]</td><td>Yes</td><td>List of scope definitions (can be empty [])</td></tr>
             <tr><td>scopes[].name</td><td>string</td><td>Yes</td><td>Scope identifier used in commits</td></tr>
             <tr><td>scopes[].team</td><td>string</td><td>No</td><td>Team prefix inserted before the message</td></tr>
+            <tr><td>branches</td><td>object</td><td>No</td><td>Branch naming config — omit to skip branch validation</td></tr>
+            <tr><td>branches.allowed</td><td>string[]</td><td>Yes*</td><td>Patterns using <code>{type}</code>, <code>{ticket}</code>, <code>{description}</code> placeholders</td></tr>
+            <tr><td>branches.types</td><td>string[]</td><td>Yes*</td><td>Allowed values for the <code>{type}</code> placeholder</td></tr>
           </tbody>
         </table>
       </div>
+      <p>* Required when <code>branches</code> is present. Placeholder rules: <code>{type}</code> matches values from <code>branches.types</code>; <code>{ticket}</code> matches <code>PROJ-123</code> format; <code>{description}</code> matches kebab-case words.</p>
 
       <p>Scope names must be unique. Scopes without <code>team</code> produce no prefix.</p>
 
@@ -681,7 +749,10 @@ gcv fix update readme
           <tbody>
             <tr><td>gcv</td><td>Interactive commit prompt</td></tr>
             <tr><td>gcv &lt;type&gt; [scope] &lt;message&gt;</td><td>Inline commit</td></tr>
-            <tr><td>gcv init</td><td>Scaffold .gc.json in current directory</td></tr>
+            <tr><td>gcv branch</td><td>Interactive branch name builder</td></tr>
+            <tr><td>gcv branch &lt;name&gt;</td><td>Inline branch create — validates then runs git switch -c</td></tr>
+            <tr><td>gcv branch validate &lt;name&gt;</td><td>Validate a branch name against config — exits 0 or 1</td></tr>
+            <tr><td>gcv init</td><td>Scaffold .gc.json and optionally install git hooks</td></tr>
             <tr><td>gcv --help / -h</td><td>Print usage</td></tr>
             <tr><td>gcv --version / -v</td><td>Print installed version</td></tr>
           </tbody>
