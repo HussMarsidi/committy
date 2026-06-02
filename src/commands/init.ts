@@ -1,7 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
-import { createDefaultConfig } from "../config/defaults.js";
-import type { GcConfig, GcScope } from "../config/types.js";
+import {
+  createDefaultConfig,
+  DEFAULT_BRANCH_PATTERNS,
+  DEFAULT_BRANCH_TYPES,
+} from "../config/defaults.js";
+import type { GcBranchConfig, GcConfig, GcScope } from "../config/types.js";
 import { detectRepo } from "../git/repo.js";
 import {
   PromptCancelledError,
@@ -35,6 +39,58 @@ async function collectTypes(): Promise<string[]> {
   return types;
 }
 
+async function collectBranchTypes(): Promise<string[]> {
+  const types: string[] = [];
+
+  while (true) {
+    const name = (await promptInput("Branch type")).trim();
+    if (!name) {
+      console.log("Branch type is required.");
+      continue;
+    }
+
+    if (types.includes(name)) {
+      console.log(`Branch type "${name}" already added.`);
+      continue;
+    }
+
+    types.push(name);
+
+    const addAnother = await promptConfirm("Add another branch type?");
+    if (!addAnother) {
+      break;
+    }
+  }
+
+  return types;
+}
+
+async function collectBranchPatterns(): Promise<string[]> {
+  const patterns: string[] = [];
+
+  while (true) {
+    const pattern = (await promptInput("Branch pattern (e.g. {type}/{description})")).trim();
+    if (!pattern) {
+      console.log("Pattern is required.");
+      continue;
+    }
+
+    if (patterns.includes(pattern)) {
+      console.log(`Pattern "${pattern}" already added.`);
+      continue;
+    }
+
+    patterns.push(pattern);
+
+    const addAnother = await promptConfirm("Add another pattern?");
+    if (!addAnother) {
+      break;
+    }
+  }
+
+  return patterns;
+}
+
 async function collectScopes(): Promise<GcScope[]> {
   const scopes: GcScope[] = [];
 
@@ -55,6 +111,25 @@ async function collectScopes(): Promise<GcScope[]> {
   }
 
   return scopes;
+}
+
+async function collectBranchConfig(): Promise<GcBranchConfig | undefined> {
+  const addBranches = await promptConfirm("Add branch naming conventions?");
+  if (!addBranches) {
+    return undefined;
+  }
+
+  const useDefaultTypes = await promptConfirm("Add default branch types?");
+  const types = useDefaultTypes
+    ? [...DEFAULT_BRANCH_TYPES]
+    : await collectBranchTypes();
+
+  const addCustomPatterns = await promptConfirm("Add custom patterns?");
+  const allowed = addCustomPatterns
+    ? await collectBranchPatterns()
+    : [...DEFAULT_BRANCH_PATTERNS];
+
+  return { allowed, types };
 }
 
 export async function runInitCommand(): Promise<void> {
@@ -93,6 +168,11 @@ export async function runInitCommand(): Promise<void> {
 
     if (addScopesNow) {
       config.scopes = await collectScopes();
+    }
+
+    const branches = await collectBranchConfig();
+    if (branches) {
+      config.branches = branches;
     }
 
     fs.writeFileSync(targetPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
