@@ -7,7 +7,6 @@ import {
   PromptCancelledError,
   promptConfirm,
   promptInput,
-  promptSelect,
 } from "../prompt/commit-prompt.js";
 
 async function collectTypes(): Promise<string[]> {
@@ -81,13 +80,7 @@ export async function runInitCommand(): Promise<void> {
     }
 
     const addDefaults = await promptConfirm("Add default conventional commit types?");
-    const scopesChoice = await promptSelect<"now" | "later">(
-      "Add scopes now or later?",
-      [
-        { name: "Now", value: "now" },
-        { name: "Later", value: "later" },
-      ],
-    );
+    const addScopesNow = await promptConfirm("Add scopes now?");
 
     let config: GcConfig;
 
@@ -98,7 +91,7 @@ export async function runInitCommand(): Promise<void> {
       config = { types, scopes: [] };
     }
 
-    if (scopesChoice === "now") {
+    if (addScopesNow) {
       config.scopes = await collectScopes();
     }
 
