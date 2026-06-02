@@ -1,6 +1,7 @@
 import { parseBumpArgs } from "../bump/args.js";
 import { detectBumpType } from "../bump/detect.js";
 import {
+  fetchRemoteTags,
   gitAdd,
   gitCommit,
   gitTag,
@@ -21,6 +22,8 @@ export async function runBumpCommand(args: string[]): Promise<void> {
     console.error("Not a git repository.");
     process.exit(1);
   }
+
+  fetchRemoteTags();
 
   const bumpArgs = parseBumpArgs(args);
 

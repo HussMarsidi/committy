@@ -9,6 +9,7 @@ import {
   tempNonRepoDir,
   tempReleaseRepo,
   tempRepoAtTag,
+  tempRepoWithRemoteOnlyTags,
 } from "./helpers.js";
 
 afterEach(() => cleanupTemps());
@@ -100,5 +101,45 @@ describe("gcv bump", () => {
     expect(stdout).toContain("--major");
     expect(stdout).toContain("--dry-run");
     expect(stdout).toContain("--no-tag");
+  });
+});
+
+describe("gcv bump — non-greenfield repo", () => {
+  it("fetches remote tags and shows fetch message", async () => {
+    const dir = tempRepoWithRemoteOnlyTags();
+    const { exitCode, stdout } = await run(["bump", "--dry-run"], dir);
+
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain("Fetching remote tags (this may take a moment)...");
+  });
+
+  it("detects base version from remote tag and computes correct next version", async () => {
+    const dir = tempRepoWithRemoteOnlyTags();
+    const { exitCode, stdout } = await run(["bump", "--dry-run"], dir);
+
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain("Current:  1.0.0");
+    expect(stdout).toContain("Next:     1.1.0");
+  });
+
+  it("bumps, writes changelog, commits, and tags using the fetched remote tag as base", async () => {
+    const dir = tempRepoWithRemoteOnlyTags();
+    const { exitCode, stdout } = await run(["bump"], dir);
+
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain("Bumped 1.0.0 → 1.1.0 (minor)");
+    expect(stdout).toContain("Tagged v1.1.0");
+
+    const tags = execSync("git tag -l", { cwd: dir }).toString().trim().split("\n");
+    expect(tags).toContain("v1.0.0"); // fetched from remote
+    expect(tags).toContain("v1.1.0"); // newly created
+  });
+
+  it("does not crash when repo has no remote configured", async () => {
+    // tempReleaseRepo has no remote — fetch should silently skip
+    const dir = tempReleaseRepo();
+    const { exitCode } = await run(["bump", "--dry-run"], dir);
+
+    expect(exitCode).toBe(0);
   });
 });

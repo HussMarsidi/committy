@@ -7,6 +7,7 @@ import {
   tempNonRepoDir,
   tempReleaseRepo,
   tempRepoAtTag,
+  tempRepoWithRemoteOnlyTags,
 } from "./helpers.js";
 
 afterEach(() => cleanupTemps());
@@ -88,5 +89,33 @@ describe("gcv changelog", () => {
     expect(stdout).toContain("--dry-run");
     expect(stdout).toContain("--from");
     expect(stdout).toContain("--all");
+  });
+});
+
+describe("gcv changelog — non-greenfield repo", () => {
+  it("fetches remote tags and shows fetch message", async () => {
+    const dir = tempRepoWithRemoteOnlyTags();
+    const { exitCode, stdout } = await run(["changelog", "--dry-run"], dir);
+
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain("Fetching remote tags (this may take a moment)...");
+  });
+
+  it("generates changelog only from commits after the remote tag, not full history", async () => {
+    const dir = tempRepoWithRemoteOnlyTags();
+    const { exitCode, stdout } = await run(["changelog", "--dry-run"], dir);
+
+    expect(exitCode).toBe(0);
+    expect(stdout).toContain("Unreleased");
+    expect(stdout).toMatch(/feat/i);
+    // Pre-tag commit should not appear — confirms range starts from fetched tag
+    expect(stdout).not.toContain("initial release");
+  });
+
+  it("does not crash when repo has no remote configured", async () => {
+    const dir = tempReleaseRepo();
+    const { exitCode } = await run(["changelog", "--dry-run"], dir);
+
+    expect(exitCode).toBe(0);
   });
 });

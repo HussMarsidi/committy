@@ -1,6 +1,6 @@
 import { execa } from "execa";
 import { execSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -72,4 +72,44 @@ export function readPackageVersion(dir: string): string {
     version: string;
   };
   return pkg.version;
+}
+
+/**
+ * Repo where v1.0.0 exists only on a local bare "remote" — not fetched locally.
+ * Simulates a non-greenfield project where tags were pushed via GitHub.
+ * Has one unreleased `feat` commit on top.
+ */
+export function tempRepoWithRemoteOnlyTags(): string {
+  // Bare repo acting as the remote
+  const remoteDir = mkdtempSync(join(tmpdir(), "committy-e2e-remote-"));
+  temps.push(remoteDir);
+  execSync("git init --bare", { cwd: remoteDir, stdio: "pipe" });
+
+  // Working local clone
+  const localDir = mkdtempSync(join(tmpdir(), "committy-e2e-nongreen-"));
+  temps.push(localDir);
+  initGitRepo(localDir);
+  execSync(`git remote add origin ${remoteDir}`, { cwd: localDir, stdio: "pipe" });
+
+  writePackageJson(localDir, "1.0.0");
+  execSync("git add package.json", { cwd: localDir, stdio: "pipe" });
+  execSync('git commit -m "chore: initial release"', { cwd: localDir, stdio: "pipe" });
+  execSync("git tag v1.0.0", { cwd: localDir, stdio: "pipe" });
+  execSync("git push origin HEAD --tags", { cwd: localDir, stdio: "pipe" });
+
+  // Delete local tag — now v1.0.0 exists only on the remote
+  execSync("git tag -d v1.0.0", { cwd: localDir, stdio: "pipe" });
+
+  // One unreleased feat commit
+  writeFileSync(join(localDir, "feature.txt"), "x");
+  execSync("git add feature.txt", { cwd: localDir, stdio: "pipe" });
+  execSync('git commit -m "feat: add OAuth support"', { cwd: localDir, stdio: "pipe" });
+
+  return localDir;
+}
+
+/** Returns true if the given dir has no git remote configured. */
+export function hasNoRemote(dir: string): boolean {
+  const remotes = execSync("git remote", { cwd: dir, stdio: "pipe", encoding: "utf8" }).trim();
+  return remotes === "";
 }

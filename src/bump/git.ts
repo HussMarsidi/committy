@@ -1,5 +1,16 @@
 import { execSync } from "node:child_process";
 
+export function fetchRemoteTags(): void {
+  try {
+    const remotes = execSync("git remote", { stdio: "pipe", encoding: "utf8" }).trim();
+    if (!remotes) return;
+    process.stdout.write("Fetching remote tags (this may take a moment)...\n");
+    execSync("git fetch --tags --quiet", { stdio: "pipe" });
+  } catch {
+    // No remote or network failure — continue with local tags
+  }
+}
+
 export function isWorkingTreeDirty(): boolean {
   const output = execSync("git status --porcelain", {
     stdio: "pipe",

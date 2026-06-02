@@ -10,11 +10,11 @@ export async function generateChangelog(options: GenerateOptions): Promise<strin
 
   const cc = new ConventionalChangelog();
   cc.readPackage();
-  cc.readRepository();
   await cc.loadPreset("conventionalcommits");
 
   if (options.all) {
     await cc.options({ releaseCount: 0 });
+    await cc.context({ version: "Unreleased" });
   } else {
     await cc.context({ version: options.version ?? "Unreleased" });
   }
