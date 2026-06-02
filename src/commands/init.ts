@@ -7,6 +7,7 @@ import {
 } from "../config/defaults.js";
 import type { GcBranchConfig, GcConfig, GcScope } from "../config/types.js";
 import { detectRepo } from "../git/repo.js";
+import { installHooks } from "../hooks/install.js";
 import {
   PromptCancelledError,
   promptConfirm,
@@ -132,9 +133,22 @@ async function collectBranchConfig(): Promise<GcBranchConfig | undefined> {
   return { allowed, types };
 }
 
+function printHookInstallResult(repoRoot: string, result: ReturnType<typeof installHooks>): void {
+  const gcHook = path.join(repoRoot, ".gc/hooks/post-checkout");
+  if (result.mode === "gcHooks") {
+    console.log(`Installed git hooks (core.hooksPath): ${result.hooksDir}`);
+    console.log(`  wrote ${gcHook}`);
+    return;
+  }
+
+  console.log(`Installed git hooks (husky delegation): ${result.huskyHooksDir}`);
+  console.log(`  wrote ${gcHook}`);
+  console.log(`  updated ${path.join(result.huskyHooksDir, "post-checkout")}`);
+}
+
 export async function runInitCommand(): Promise<void> {
   try {
-    const { isAtRoot } = detectRepo();
+    const { repoRoot, isAtRoot } = detectRepo();
 
     if (!isAtRoot) {
       const proceed = await promptConfirm(
@@ -177,6 +191,16 @@ export async function runInitCommand(): Promise<void> {
 
     fs.writeFileSync(targetPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
     console.log(`Created ${targetPath}`);
+
+    const installHookFiles = await promptConfirm(
+      "Install git hooks for branch validation?",
+    );
+    if (installHookFiles && repoRoot) {
+      const result = installHooks(repoRoot);
+      printHookInstallResult(repoRoot, result);
+    } else if (installHookFiles && !repoRoot) {
+      console.log("Not inside a git repository — hooks were not installed.");
+    }
   } catch (error) {
     if (error instanceof PromptCancelledError) {
       process.exit(0);
