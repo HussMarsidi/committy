@@ -31,7 +31,7 @@ Config:
   Optional .gc.json in repo (walked up from cwd).
   Malformed config prints an error and exits — no silent fallback.
 
-Docs: https://github.com/konven/konven
+Docs: https://github.com/committy/committy
 `;
 
 function getVersion(): string {

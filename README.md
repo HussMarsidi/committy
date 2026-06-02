@@ -1,9 +1,9 @@
-# konven (`gcv`)
+# committy (`gcv`)
 
 A lightweight global CLI for conventional commits. Install once, use in any repo. No project config required.
 
 ```bash
-npm install -g konven
+npm install -g committy
 ```
 
 ---
@@ -12,10 +12,10 @@ npm install -g konven
 
 You need Node 18+ and a git repo with staged files.
 
-**1. Install konven globally:**
+**1. Install committy globally:**
 
 ```bash
-npm install -g konven
+npm install -g committy
 ```
 
 **2. Stage something:**
@@ -38,7 +38,7 @@ You'll see:
 ? Message: fix svg images not loading
 ```
 
-Select a type, optionally pick a scope, write your message. konven runs `git commit` for you.
+Select a type, optionally pick a scope, write your message. committy runs `git commit` for you.
 
 ---
 
@@ -62,7 +62,7 @@ gcv fix update readme
 # → git commit -m "fix: update readme"
 ```
 
-If the args don't fully resolve (invalid type, missing message), konven drops into the prompt with valid fields pre-filled and locked. You only answer what's missing.
+If the args don't fully resolve (invalid type, missing message), committy drops into the prompt with valid fields pre-filled and locked. You only answer what's missing.
 
 ### Set up a team config
 
@@ -72,11 +72,11 @@ gcv init
 
 Walks you through creating `.gc.json` in the current directory. Commit this file so the whole team shares the same types and scopes.
 
-If you're not at the repo root, konven warns you before writing.
+If you're not at the repo root, committy warns you before writing.
 
 ### Use an existing config
 
-Nothing to do. konven walks up from your current directory to the repo root looking for `.gc.json`. If it finds one, it uses it. If not, it falls back to the [default type list](#default-types).
+Nothing to do. committy walks up from your current directory to the repo root looking for `.gc.json`. If it finds one, it uses it. If not, it falls back to the [default type list](#default-types).
 
 ---
 
@@ -98,12 +98,12 @@ Nothing to do. konven walks up from your current directory to the repo root look
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `types` | `string[]` | Yes | Non-empty list of allowed commit types |
-| `scopes` | `object[]` | Yes | List of scope definitions (can be empty `[]`) |
-| `scopes[].name` | `string` | Yes | Scope identifier used in commits |
-| `scopes[].team` | `string` | No | Team prefix inserted before the message |
+| Field           | Type       | Required | Description                                   |
+| --------------- | ---------- | -------- | --------------------------------------------- |
+| `types`         | `string[]` | Yes      | Non-empty list of allowed commit types        |
+| `scopes`        | `object[]` | Yes      | List of scope definitions (can be empty `[]`) |
+| `scopes[].name` | `string`   | Yes      | Scope identifier used in commits              |
+| `scopes[].team` | `string`   | No       | Team prefix inserted before the message       |
 
 Scope names must be unique. Scopes without `team` produce no prefix.
 
@@ -123,7 +123,7 @@ feat(auth): PCUST fix svg images not loading
 
 ### Config resolution
 
-konven walks up from `cwd` to the repo root, checking each directory for `.gc.json`. The first file found wins. If none is found, [default types](#default-types) are used and scope validation is skipped.
+committy walks up from `cwd` to the repo root, checking each directory for `.gc.json`. The first file found wins. If none is found, [default types](#default-types) are used and scope validation is skipped.
 
 ---
 
@@ -137,10 +137,10 @@ Interactive commit prompt. Loads config if present, uses defaults if not.
 
 Inline commit. Argument parsing rules:
 
-| Args | Parsed as |
-|---|---|
-| 1 arg | message only — prompts for type and scope |
-| 2 args | see disambiguation below |
+| Args    | Parsed as                                              |
+| ------- | ------------------------------------------------------ |
+| 1 arg   | message only — prompts for type and scope              |
+| 2 args  | see disambiguation below                               |
 | 3+ args | `type` + `scope` + `message (rest joined with spaces)` |
 
 **2-arg disambiguation** (config present):
@@ -154,7 +154,7 @@ Without config, 2 args always mean `type + message`.
 
 **Validation fallback:**
 
-Invalid or missing fields don't hard-fail. konven opens the prompt with valid fields locked and the cursor on the first problem field (type → scope → message).
+Invalid or missing fields don't hard-fail. committy opens the prompt with valid fields locked and the cursor on the first problem field (type → scope → message).
 
 ### `gcv init`
 
@@ -163,7 +163,7 @@ Scaffolds `.gc.json` in the current directory. Prompts:
 - Add default conventional commit types?
 - Add scopes now or later?
 
-If cwd is inside a git repo but not the root, konven asks for confirmation before writing. If `.gc.json` already exists, asks before overwriting.
+If cwd is inside a git repo but not the root, committy asks for confirmation before writing. If `.gc.json` already exists, asks before overwriting.
 
 ### `gcv --help` / `-h`
 

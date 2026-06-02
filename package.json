@@ -1,5 +1,5 @@
 {
-  "name": "konven",
+  "name": "committy",
   "version": "0.1.0",
   "description": "A lightweight global CLI for enforcing git commit conventions",
   "bin": {
