@@ -3,6 +3,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { runBranchCommand } from "./commands/branch.js";
+import { runChangelogCommand } from "./commands/changelog.js";
 import { runCommitCommand } from "./commands/commit.js";
 import { runInitCommand } from "./commands/init.js";
 
@@ -11,11 +12,18 @@ const HELP_TEXT = `Usage: gcv [command] [options] [type] [scope] [message...]
 A lightweight global CLI for enforcing git commit conventions.
 
 Commands:
-  gcv              Interactive commit prompt
-  gcv init         Scaffold .gc.json in current directory
-  gcv branch       Create or validate a branch name
-  gcv --help       Show this help
-  gcv --version    Show version
+  gcv                          Interactive commit prompt
+  gcv init                     Scaffold .gc.json in current directory
+  gcv branch                   Create or validate a branch name
+  gcv changelog                Generate CHANGELOG.md from git history
+  gcv --help                   Show this help
+  gcv --version                Show version
+
+Changelog:
+  gcv changelog                Prepend unreleased commits to CHANGELOG.md
+  gcv changelog --dry-run      Print to stdout, no file written
+  gcv changelog --from v1.0.0  Generate from a specific tag
+  gcv changelog --all          Regenerate entire changelog from scratch
 
 Branch:
   gcv branch                         Interactive branch creator
@@ -52,7 +60,7 @@ function printHelp(): void {
 }
 
 function parseArgs(argv: string[]): {
-  command: "help" | "version" | "init" | "commit" | "branch";
+  command: "help" | "version" | "init" | "commit" | "branch" | "changelog";
   inlineArgs: string[];
 } {
   if (argv.length === 0) {
@@ -75,6 +83,10 @@ function parseArgs(argv: string[]): {
 
   if (first === "branch") {
     return { command: "branch", inlineArgs: rest };
+  }
+
+  if (first === "changelog") {
+    return { command: "changelog", inlineArgs: rest };
   }
 
   if (first.startsWith("-")) {
@@ -105,6 +117,9 @@ async function main(): Promise<void> {
       break;
     case "branch":
       await runBranchCommand(inlineArgs);
+      break;
+    case "changelog":
+      await runChangelogCommand(inlineArgs);
       break;
     case "commit":
       await runCommitCommand(inlineArgs);
