@@ -284,17 +284,17 @@ konven/
 
 Ship these, nothing else:
 
-- [ ] `gcv` — interactive prompt
-- [ ] `gcv <type> [scope] <message>` — inline with graceful fallback
-- [ ] `gcv init` — generates `.gc.json` in cwd with location confirm
-- [ ] JSON config support via native `JSON.parse`
-- [ ] Malformed config error upfront
-- [ ] 2-arg scope disambiguation via config lookup
-- [ ] Optional scope (prompt + inline)
-- [ ] Team prefix per scope
-- [ ] Locked valid fields in inline fallback
-- [ ] Staged files check
-- [ ] Default types when no config
+- [x] `gcv` — interactive prompt
+- [x] `gcv <type> [scope] <message>` — inline with graceful fallback
+- [x] `gcv init` — generates `.gc.json` in cwd with location confirm
+- [x] JSON config support via native `JSON.parse`
+- [x] Malformed config error upfront
+- [x] 2-arg scope disambiguation via config lookup
+- [x] Optional scope (prompt + inline)
+- [x] Team prefix per scope
+- [x] Locked valid fields in inline fallback
+- [x] Staged files check
+- [x] Default types when no config
 
 ---
 
