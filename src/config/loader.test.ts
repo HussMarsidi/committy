@@ -33,6 +33,33 @@ describe("config loader", () => {
     ).toThrow(/duplicate scope name/);
   });
 
+  it("parses optional branches section", () => {
+    const config = parseAndValidateConfig(
+      {
+        types: ["feat"],
+        scopes: [],
+        branches: {
+          allowed: ["{type}/{description}"],
+          types: ["feat", "fix"],
+        },
+      },
+      "/tmp/.gc.json",
+    );
+    expect(config.branches).toEqual({
+      allowed: ["{type}/{description}"],
+      types: ["feat", "fix"],
+    });
+  });
+
+  it("rejects malformed branches section", () => {
+    expect(() =>
+      parseAndValidateConfig(
+        { types: ["feat"], scopes: [], branches: { allowed: [], types: ["feat"] } },
+        "/tmp/.gc.json",
+      ),
+    ).toThrow(/branches\.allowed/);
+  });
+
   it("rejects invalid JSON via loadConfigFromFile", () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gcv-test-"));
     const filePath = path.join(dir, ".gc.json");
