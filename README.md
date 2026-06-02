@@ -5,7 +5,7 @@
 A lightweight global CLI for conventional commits. Install once, use in any repo. No project config required.
 
 ```bash
-npm install -g committy
+npm install -g @hussmarsidi/committy
 ```
 
 ---
@@ -17,7 +17,7 @@ You need Node 18+ and a git repo with staged files.
 **1. Install committy globally:**
 
 ```bash
-npm install -g committy
+npm install -g @hussmarsidi/committy
 ```
 
 **2. Stage something:**
@@ -66,13 +66,44 @@ gcv fix update readme
 
 If the args don't fully resolve (invalid type, missing message), committy drops into the prompt with valid fields pre-filled and locked. You only answer what's missing.
 
+### Create a branch interactively
+
+```bash
+gcv branch
+```
+
+Prompts you to pick a pattern, fill in each placeholder, then runs `git switch -c` with the validated name.
+
+### Create a branch inline
+
+```bash
+gcv branch feat/add-login-page
+# → git switch -c feat/add-login-page
+
+gcv branch feat/PROJ-123-add-login-page
+# → git switch -c feat/PROJ-123-add-login-page
+```
+
+Validates against your `branches` config before creating. If no config is present, skips validation and creates the branch directly.
+
+### Validate a branch name
+
+```bash
+gcv branch validate feat/add-login-page
+# exits 0 if valid, 1 if not
+```
+
+Used automatically by the git hook installed via `gcv init`.
+
 ### Set up a team config
 
 ```bash
 gcv init
 ```
 
-Walks you through creating `.gc.json` in the current directory. Commit this file so the whole team shares the same types and scopes.
+Walks you through creating `.gc.json` in the current directory. Commit this file so the whole team shares the same types, scopes, and branch rules.
+
+v0.2 adds two optional init steps: branch naming config and git hook installation. committy detects whether Husky is present and adapts — no manual hook wiring needed.
 
 If you're not at the repo root, committy warns you before writing.
 
@@ -96,16 +127,27 @@ Nothing to do. committy walks up from your current directory to the repo root lo
     { "name": "payment", "team": "PCUST" },
     { "name": "dashboard", "team": "PINT" },
     { "name": "deps" }
-  ]
+  ],
+  "branches": {
+    "allowed": ["{type}/{description}", "{type}/{ticket}-{description}"],
+    "types": ["feat", "fix", "hotfix", "release", "chore"]
+  }
 }
 ```
 
-| Field           | Type       | Required | Description                                   |
-| --------------- | ---------- | -------- | --------------------------------------------- |
-| `types`         | `string[]` | Yes      | Non-empty list of allowed commit types        |
-| `scopes`        | `object[]` | Yes      | List of scope definitions (can be empty `[]`) |
-| `scopes[].name` | `string`   | Yes      | Scope identifier used in commits              |
-| `scopes[].team` | `string`   | No       | Team prefix inserted before the message       |
+| Field                | Type       | Required | Description                                              |
+| -------------------- | ---------- | -------- | -------------------------------------------------------- |
+| `types`              | `string[]` | Yes      | Non-empty list of allowed commit types                   |
+| `scopes`             | `object[]` | Yes      | List of scope definitions (can be empty `[]`)            |
+| `scopes[].name`      | `string`   | Yes      | Scope identifier used in commits                         |
+| `scopes[].team`      | `string`   | No       | Team prefix inserted before the message                  |
+| `branches`           | `object`   | No       | Branch naming config — omit to skip branch validation    |
+| `branches.allowed`   | `string[]` | Yes*     | Patterns using `{type}`, `{ticket}`, `{description}`     |
+| `branches.types`     | `string[]` | Yes*     | Allowed values for the `{type}` placeholder              |
+
+\* Required when `branches` is present.
+
+Placeholder rules: `{type}` matches values from `branches.types`; `{ticket}` matches `PROJ-123` format; `{description}` matches kebab-case words.
 
 Scope names must be unique. Scopes without `team` produce no prefix.
 
@@ -158,12 +200,21 @@ Without config, 2 args always mean `type + message`.
 
 Invalid or missing fields don't hard-fail. committy opens the prompt with valid fields locked and the cursor on the first problem field (type → scope → message).
 
+### `gcv branch`
+
+Interactive branch name builder. Reads `branches` config, prompts for each placeholder, runs `git switch -c` with the validated name.
+
+### `gcv branch <name>`
+
+Inline branch create. Validates against `branches` config then runs `git switch -c`. Skips validation if no `branches` config is present.
+
+### `gcv branch validate <name>`
+
+Validates a branch name against config. Exits 0 if valid, 1 if not. No branch is created. Used by the git hook installed via `gcv init`.
+
 ### `gcv init`
 
-Scaffolds `.gc.json` in the current directory. Prompts:
-
-- Add default conventional commit types?
-- Add scopes now or later?
+Scaffolds `.gc.json` in the current directory. Prompts for commit types, scopes, branch config, and optionally installs git hooks. Detects Husky automatically — no manual hook wiring needed.
 
 If cwd is inside a git repo but not the root, committy asks for confirmation before writing. If `.gc.json` already exists, asks before overwriting.
 
