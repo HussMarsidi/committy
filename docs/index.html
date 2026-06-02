@@ -540,32 +540,33 @@
         </ul>
       </div>
 
-      <div class="milestone wip">
+      <div class="milestone done">
         <div class="milestone-dot"></div>
         <div class="milestone-header">
           <span class="milestone-version">v0.3</span>
           <span class="milestone-title">Changelog</span>
-          <span class="tag tag-wip">In progress</span>
+          <span class="tag tag-done">Launched</span>
         </div>
         <ul class="milestone-items">
-          <li><code>gcv changelog</code> — generates from git log</li>
-          <li><code>--from</code>, <code>--dry-run</code> flags</li>
-          <li>Groups by type, includes team prefix</li>
+          <li><code>gcv changelog</code> — generates CHANGELOG.md from git log</li>
+          <li><code>--from &lt;tag&gt;</code>, <code>--dry-run</code>, <code>--all</code> flags</li>
+          <li>Groups by type using Conventional Commits preset</li>
+          <li>Prepends to existing CHANGELOG.md</li>
         </ul>
       </div>
 
-      <div class="milestone">
+      <div class="milestone done">
         <div class="milestone-dot"></div>
         <div class="milestone-header">
           <span class="milestone-version">v0.4</span>
           <span class="milestone-title">Versioning</span>
-          <span class="tag tag-upcoming">Upcoming</span>
+          <span class="tag tag-done">Launched</span>
         </div>
         <ul class="milestone-items">
-          <li><code>gcv bump</code> — semver auto-detect from commits</li>
-          <li><code>--minor</code>, <code>--dry-run</code> flags</li>
-          <li>Git tag creation</li>
-          <li>Auto-run changelog after bump</li>
+          <li><code>gcv bump</code> — semver auto-detect from commits since last tag</li>
+          <li><code>--major</code>, <code>--minor</code>, <code>--patch</code> overrides</li>
+          <li><code>--dry-run</code>, <code>--no-tag</code> flags</li>
+          <li>Writes changelog, bumps <code>package.json</code>, commits, and creates git tag</li>
         </ul>
       </div>
 
@@ -582,7 +583,7 @@
       <h3>Quick start</h3>
       <p>You need Node 18+ and a git repo with staged files.</p>
       <pre><code><span class="comment"># 1. Install globally</span>
-npm install -g committy
+npm install -g @hussmarsidi/committy
 
 <span class="comment"># 2. Stage your changes</span>
 git add .
@@ -733,6 +734,75 @@ gcv branch validate feat/add-login-page</code></pre>
     </div>
 
     <div class="doc-section">
+      <h3>Changelog</h3>
+      <p>Run <code>gcv changelog</code> to generate a <code>CHANGELOG.md</code> from your commit history. By default it generates from the last git tag to HEAD and prepends to any existing changelog.</p>
+      <pre><code><span class="comment"># Generate from last tag → HEAD</span>
+gcv changelog
+
+<span class="comment"># Generate from a specific tag</span>
+gcv changelog --from v0.1.0
+
+<span class="comment"># Regenerate the full history</span>
+gcv changelog --all
+
+<span class="comment"># Preview without writing</span>
+gcv changelog --dry-run</code></pre>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Flag</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>--from &lt;tag&gt;</td><td>Start range from a specific git tag or commit</td></tr>
+            <tr><td>--all</td><td>Regenerate the entire changelog from all commits</td></tr>
+            <tr><td>--dry-run</td><td>Print output to stdout — no file written</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Uses the Conventional Commits preset. Only commits that follow the convention appear in the output — non-conventional commits are silently excluded.</p>
+    </div>
+
+    <div class="doc-section">
+      <h3>Bump</h3>
+      <p>Run <code>gcv bump</code> to release a new version. It reads commits since the last tag, determines the semver bump type, generates the changelog, updates <code>package.json</code>, commits the release, and creates a git tag — in one command.</p>
+      <pre><code><span class="comment"># Auto-detect bump type from commits</span>
+gcv bump
+<span class="cmd-output">Bumped 0.3.0 → 0.4.0 (minor)
+Tagged v0.4.0</span>
+
+<span class="comment"># Override bump type manually</span>
+gcv bump --major
+gcv bump --minor
+gcv bump --patch
+
+<span class="comment"># Preview what would happen — no files written</span>
+gcv bump --dry-run
+<span class="cmd-output">Detected: minor
+Current:  0.3.0
+Next:     0.4.0
+
+--dry-run: no files written, no commit, no tag.</span>
+
+<span class="comment"># Bump and generate changelog without tagging</span>
+gcv bump --no-tag</code></pre>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Flag</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>--major</td><td>Force a major bump regardless of commit history</td></tr>
+            <tr><td>--minor</td><td>Force a minor bump</td></tr>
+            <tr><td>--patch</td><td>Force a patch bump</td></tr>
+            <tr><td>--dry-run</td><td>Print detected type and next version — no changes made</td></tr>
+            <tr><td>--no-tag</td><td>Skip git tag creation</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The working tree must be clean before running <code>gcv bump</code>. If <code>package.json</code> is present, the version field is updated automatically. The bump type is inferred from commits: <code>feat</code> → minor, <code>fix</code> / <code>chore</code> / others → patch, breaking change footer → major.</p>
+    </div>
+
+    <div class="doc-section">
       <h3>Default types</h3>
       <p>Used when no config is present. Follows <a href="https://www.conventionalcommits.org/" target="_blank">Conventional Commits v1.0.0</a>.</p>
       <pre><code>feat  fix  chore  docs  refactor  test  style  perf  ci  build  revert</code></pre>
@@ -752,6 +822,14 @@ gcv branch validate feat/add-login-page</code></pre>
             <tr><td>gcv branch &lt;name&gt;</td><td>Inline branch create — validates then runs git switch -c</td></tr>
             <tr><td>gcv branch validate &lt;name&gt;</td><td>Validate a branch name against config — exits 0 or 1</td></tr>
             <tr><td>gcv init</td><td>Scaffold .gc.json and optionally install git hooks</td></tr>
+            <tr><td>gcv changelog</td><td>Generate CHANGELOG.md from commits since last tag</td></tr>
+            <tr><td>gcv changelog --from &lt;tag&gt;</td><td>Generate from a specific tag</td></tr>
+            <tr><td>gcv changelog --all</td><td>Regenerate full history</td></tr>
+            <tr><td>gcv changelog --dry-run</td><td>Preview output without writing</td></tr>
+            <tr><td>gcv bump</td><td>Auto-detect semver bump, write changelog, commit, and tag</td></tr>
+            <tr><td>gcv bump --major/--minor/--patch</td><td>Override bump type</td></tr>
+            <tr><td>gcv bump --dry-run</td><td>Preview bump without making any changes</td></tr>
+            <tr><td>gcv bump --no-tag</td><td>Bump and changelog without creating a git tag</td></tr>
             <tr><td>gcv --help / -h</td><td>Print usage</td></tr>
             <tr><td>gcv --version / -v</td><td>Print installed version</td></tr>
           </tbody>

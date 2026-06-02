@@ -107,6 +107,31 @@ v0.2 adds two optional init steps: branch naming config and git hook installatio
 
 If you're not at the repo root, committy warns you before writing.
 
+### Generate a changelog
+
+```bash
+gcv changelog
+```
+
+Generates `CHANGELOG.md` from commits since the last git tag. Prepends to any existing file. Use `--from <tag>` to start from a specific tag, `--all` to regenerate the full history, or `--dry-run` to preview without writing.
+
+### Bump the version
+
+```bash
+gcv bump
+```
+
+Reads commits since the last tag, auto-detects the semver bump type, generates the changelog, updates `package.json`, commits the release, and creates a git tag. Working tree must be clean.
+
+```bash
+gcv bump --dry-run
+# Detected: minor
+# Current:  0.3.0
+# Next:     0.4.0
+#
+# --dry-run: no files written, no commit, no tag.
+```
+
 ### Use an existing config
 
 Nothing to do. committy walks up from your current directory to the repo root looking for `.gc.json`. If it finds one, it uses it. If not, it falls back to the [default type list](#default-types).
@@ -217,6 +242,30 @@ Validates a branch name against config. Exits 0 if valid, 1 if not. No branch is
 Scaffolds `.gc.json` in the current directory. Prompts for commit types, scopes, branch config, and optionally installs git hooks. Detects Husky automatically — no manual hook wiring needed.
 
 If cwd is inside a git repo but not the root, committy asks for confirmation before writing. If `.gc.json` already exists, asks before overwriting.
+
+### `gcv changelog`
+
+Generates `CHANGELOG.md` from commits since the last git tag. Prepends to any existing changelog. Only commits following the Conventional Commits convention appear in the output.
+
+| Flag | Description |
+| --- | --- |
+| `--from <tag>` | Start range from a specific git tag or commit |
+| `--all` | Regenerate full history from all commits |
+| `--dry-run` | Print output to stdout — no file written |
+
+### `gcv bump`
+
+Auto-detects the semver bump type from commits since the last tag, generates the changelog, bumps `package.json` (if present), commits, and creates a git tag.
+
+Bump type inference: `feat` → minor, `fix` / `chore` / others → patch, breaking change footer → major.
+
+Working tree must be clean before running.
+
+| Flag | Description |
+| --- | --- |
+| `--major` / `--minor` / `--patch` | Override the detected bump type |
+| `--dry-run` | Print detected type and next version — no changes made |
+| `--no-tag` | Skip git tag creation |
 
 ### `gcv --help` / `-h`
 
