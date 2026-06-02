@@ -3,9 +3,15 @@ export type GcScope = {
   team?: string;
 };
 
+export type GcBranchConfig = {
+  allowed: string[];
+  types: string[];
+};
+
 export type GcConfig = {
   types: string[];
   scopes: GcScope[];
+  branches?: GcBranchConfig;
 };
 
 export type LoadedConfig = {

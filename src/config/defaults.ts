@@ -1,4 +1,4 @@
-import type { GcConfig } from "./types.js";
+import type { GcBranchConfig, GcConfig } from "./types.js";
 
 export const DEFAULT_TYPES = [
   "feat",
@@ -13,6 +13,26 @@ export const DEFAULT_TYPES = [
   "build",
   "revert",
 ] as const;
+
+export const DEFAULT_BRANCH_TYPES = [
+  "feat",
+  "fix",
+  "hotfix",
+  "release",
+  "chore",
+] as const;
+
+export const DEFAULT_BRANCH_PATTERNS = [
+  "{type}/{description}",
+  "{type}/{ticket}-{description}",
+] as const;
+
+export function createDefaultBranchConfig(): GcBranchConfig {
+  return {
+    allowed: [...DEFAULT_BRANCH_PATTERNS],
+    types: [...DEFAULT_BRANCH_TYPES],
+  };
+}
 
 export function createDefaultConfig(): GcConfig {
   return {
