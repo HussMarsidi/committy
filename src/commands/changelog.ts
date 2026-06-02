@@ -11,11 +11,7 @@ export async function runChangelogCommand(args: string[]): Promise<void> {
 
   const { dryRun, from, all } = parseChangelogArgs(args);
 
-  const content = await generateChangelog({
-    version: "Unreleased",
-    from,
-    all,
-  });
+  const content = await generateChangelog({ from, all });
 
   if (!content.trim()) {
     console.log("No releasable commits found.");

@@ -16,6 +16,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "changelog": "node dist/index.js changelog",
+    "changelog:dry": "node dist/index.js changelog --dry-run",
     "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
@@ -25,6 +27,14 @@
     "cli"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HussMarsidi/committy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HussMarsidi/committy/issues"
+  },
+  "homepage": "https://github.com/HussMarsidi/committy#readme",
   "dependencies": {
     "@inquirer/prompts": "^7.5.3",
     "conventional-changelog": "^7.2.0",

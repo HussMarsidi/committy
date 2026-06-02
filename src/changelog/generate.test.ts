@@ -5,6 +5,8 @@ const context = vi.fn();
 const options = vi.fn();
 const commits = vi.fn();
 const write = vi.fn();
+const readPackage = vi.fn();
+const readRepository = vi.fn();
 
 const ConventionalChangelogMock = vi.fn().mockImplementation(() => ({
   loadPreset,
@@ -12,6 +14,8 @@ const ConventionalChangelogMock = vi.fn().mockImplementation(() => ({
   options,
   commits,
   write,
+  readPackage,
+  readRepository,
 }));
 
 vi.mock("conventional-changelog", () => ({
@@ -34,18 +38,21 @@ describe("generateChangelog", () => {
     loadPreset.mockResolvedValue(undefined);
     context.mockResolvedValue(undefined);
     options.mockResolvedValue(undefined);
+    readPackage.mockReturnThis();
+    readRepository.mockReturnThis();
   });
 
-  it("loads preset and sets Unreleased context by default", async () => {
+  it("loads preset, package, repository, and sets Unreleased context by default", async () => {
     write.mockReturnValue(createWriteGenerator(["# changelog\n"]));
 
     const result = await generateChangelog({
-      version: "Unreleased",
       from: null,
       all: false,
     });
 
     expect(loadPreset).toHaveBeenCalledWith("conventionalcommits");
+    expect(readPackage).toHaveBeenCalled();
+    expect(readRepository).toHaveBeenCalled();
     expect(context).toHaveBeenCalledWith({ version: "Unreleased" });
     expect(options).not.toHaveBeenCalled();
     expect(commits).not.toHaveBeenCalled();
@@ -64,16 +71,16 @@ describe("generateChangelog", () => {
     expect(context).toHaveBeenCalledWith({ version: "1.3.0" });
   });
 
-  it("calls options with releaseCount 0 when all is true", async () => {
+  it("calls options with releaseCount 0 and skips context when all is true", async () => {
     write.mockReturnValue(createWriteGenerator(["full\n"]));
 
     await generateChangelog({
-      version: "Unreleased",
       from: null,
       all: true,
     });
 
     expect(options).toHaveBeenCalledWith({ releaseCount: 0 });
+    expect(context).not.toHaveBeenCalled();
     expect(commits).not.toHaveBeenCalled();
   });
 
@@ -81,7 +88,6 @@ describe("generateChangelog", () => {
     write.mockReturnValue(createWriteGenerator(["partial\n"]));
 
     await generateChangelog({
-      version: "Unreleased",
       from: "v1.0.0",
       all: false,
     });
@@ -94,12 +100,12 @@ describe("generateChangelog", () => {
     write.mockReturnValue(createWriteGenerator(["full\n"]));
 
     await generateChangelog({
-      version: "Unreleased",
       from: "v1.0.0",
       all: true,
     });
 
     expect(options).toHaveBeenCalledWith({ releaseCount: 0 });
+    expect(context).not.toHaveBeenCalled();
     expect(commits).not.toHaveBeenCalled();
   });
 
@@ -110,16 +116,13 @@ describe("generateChangelog", () => {
       })(),
     );
 
-    await expect(
-      generateChangelog({ version: "Unreleased", from: null, all: false }),
-    ).rejects.toThrow("write failed");
+    await expect(generateChangelog({ from: null, all: false })).rejects.toThrow("write failed");
   });
 
   it("returns empty string when write yields nothing", async () => {
     write.mockReturnValue(createWriteGenerator([]));
 
     const result = await generateChangelog({
-      version: "Unreleased",
       from: null,
       all: false,
     });
