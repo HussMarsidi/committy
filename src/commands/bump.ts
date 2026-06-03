@@ -60,7 +60,7 @@ export async function runBumpCommand(args: string[]): Promise<void> {
   const content = await generateChangelog({
     version: next,
     from: null,
-    all: false,
+    all: false, // releaseCount: 1 — commits since last tag
   });
 
   if (!content.trim()) {

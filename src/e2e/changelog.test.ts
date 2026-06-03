@@ -61,7 +61,21 @@ describe("gcv changelog", () => {
     expect(second.exitCode).toBe(0);
     const content = readFileSync(join(dir, "CHANGELOG.md"), "utf8");
     expect(content).not.toBe("# placeholder\n");
-    expect(content).toContain("Unreleased");
+    expect(content).toContain("0.1.0");
+  });
+
+  it("does not duplicate Unreleased when run twice without a new tag", async () => {
+    const dir = tempReleaseRepo();
+    const first = await run(["changelog"], dir);
+    expect(first.exitCode).toBe(0);
+
+    const second = await run(["changelog"], dir);
+    expect(second.exitCode).toBe(0);
+
+    const content = readFileSync(join(dir, "CHANGELOG.md"), "utf8");
+    const unreleasedCount = (content.match(/^## (?:\[Unreleased\]|Unreleased\b)/gm) ?? [])
+      .length;
+    expect(unreleasedCount).toBe(1);
   });
 
   it("at latest tag still writes CHANGELOG.md with an Unreleased section", async () => {

@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execFileSync, execSync } from "node:child_process";
 
 export function fetchRemoteTags(): void {
   try {
@@ -29,7 +29,7 @@ export function isGitRepo(): boolean {
 }
 
 export function gitAdd(files: string[]): void {
-  execSync(`git add ${files.join(" ")}`, { stdio: "pipe" });
+  execFileSync("git", ["add", ...files], { stdio: "pipe" });
 }
 
 export function gitCommit(version: string): void {

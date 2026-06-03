@@ -14,8 +14,10 @@ export async function generateChangelog(options: GenerateOptions): Promise<strin
 
   if (options.all) {
     await cc.options({ releaseCount: 0 });
-    await cc.context({ version: "Unreleased" });
   } else {
+    if (!options.from) {
+      await cc.options({ releaseCount: 1 });
+    }
     await cc.context({ version: options.version ?? "Unreleased" });
   }
 

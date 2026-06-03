@@ -2,9 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:child_process", () => ({
   execSync: vi.fn(),
+  execFileSync: vi.fn(),
 }));
 
-import { execSync } from "node:child_process";
+import { execFileSync, execSync } from "node:child_process";
 import {
   gitAdd,
   gitCommit,
@@ -52,13 +53,13 @@ describe("isWorkingTreeDirty", () => {
 
 describe("gitAdd", () => {
   beforeEach(() => {
-    vi.mocked(execSync).mockReset();
-    vi.mocked(execSync).mockReturnValue(Buffer.from(""));
+    vi.mocked(execFileSync).mockReset();
+    vi.mocked(execFileSync).mockReturnValue(Buffer.from(""));
   });
 
   it("stages listed files", () => {
     gitAdd(["CHANGELOG.md", "package.json"]);
-    expect(execSync).toHaveBeenCalledWith("git add CHANGELOG.md package.json", {
+    expect(execFileSync).toHaveBeenCalledWith("git", ["add", "CHANGELOG.md", "package.json"], {
       stdio: "pipe",
     });
   });

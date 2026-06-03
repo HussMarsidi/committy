@@ -42,7 +42,7 @@ describe("generateChangelog", () => {
     readRepository.mockReturnThis();
   });
 
-  it("loads preset, package, repository, and sets Unreleased context by default", async () => {
+  it("loads preset, sets Unreleased context and releaseCount 1 by default", async () => {
     write.mockReturnValue(createWriteGenerator(["# changelog\n"]));
 
     const result = await generateChangelog({
@@ -52,14 +52,13 @@ describe("generateChangelog", () => {
 
     expect(loadPreset).toHaveBeenCalledWith("conventionalcommits");
     expect(readPackage).toHaveBeenCalled();
-    expect(readRepository).toHaveBeenCalled();
+    expect(options).toHaveBeenCalledWith({ releaseCount: 1 });
     expect(context).toHaveBeenCalledWith({ version: "Unreleased" });
-    expect(options).not.toHaveBeenCalled();
     expect(commits).not.toHaveBeenCalled();
     expect(result).toBe("# changelog\n");
   });
 
-  it("passes explicit version to context", async () => {
+  it("passes explicit version to context and releaseCount 1", async () => {
     write.mockReturnValue(createWriteGenerator(["release\n"]));
 
     await generateChangelog({
@@ -68,6 +67,7 @@ describe("generateChangelog", () => {
       all: false,
     });
 
+    expect(options).toHaveBeenCalledWith({ releaseCount: 1 });
     expect(context).toHaveBeenCalledWith({ version: "1.3.0" });
   });
 
