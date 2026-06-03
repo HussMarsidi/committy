@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { parseBumpArgs } from "../bump/args.js";
 import { detectBumpType } from "../bump/detect.js";
 import {
@@ -15,7 +17,18 @@ import {
   writePackageVersion,
 } from "../bump/version.js";
 import { generateChangelog } from "../changelog/generate.js";
-import { writeChangelog } from "../changelog/write.js";
+import { writeChangelogFile, writeReleaseChangelog } from "../changelog/write.js";
+
+async function bootstrapChangelogIfMissing(changelogPath: string): Promise<void> {
+  if (existsSync(changelogPath)) {
+    return;
+  }
+
+  const history = await generateChangelog({ from: null, init: true });
+  if (history.trim()) {
+    await writeChangelogFile(history, changelogPath);
+  }
+}
 
 export async function runBumpCommand(args: string[]): Promise<void> {
   if (!isGitRepo()) {
@@ -57,10 +70,13 @@ export async function runBumpCommand(args: string[]): Promise<void> {
     process.exit(0);
   }
 
+  const changelogPath = path.join(process.cwd(), "CHANGELOG.md");
+  await bootstrapChangelogIfMissing(changelogPath);
+
   const content = await generateChangelog({
     version: next,
     from: null,
-    all: false, // releaseCount: 1 — commits since last tag
+    init: false,
   });
 
   if (!content.trim()) {
@@ -68,7 +84,7 @@ export async function runBumpCommand(args: string[]): Promise<void> {
     process.exit(0);
   }
 
-  await writeChangelog({ content, dryRun: false, all: false });
+  await writeReleaseChangelog(content, changelogPath);
 
   if (hasPackageJson()) {
     writePackageVersion(next);

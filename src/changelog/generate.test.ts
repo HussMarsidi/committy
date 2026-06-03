@@ -47,7 +47,7 @@ describe("generateChangelog", () => {
 
     const result = await generateChangelog({
       from: null,
-      all: false,
+      init: false,
     });
 
     expect(loadPreset).toHaveBeenCalledWith("conventionalcommits");
@@ -64,19 +64,19 @@ describe("generateChangelog", () => {
     await generateChangelog({
       version: "1.3.0",
       from: null,
-      all: false,
+      init: false,
     });
 
     expect(options).toHaveBeenCalledWith({ releaseCount: 1 });
     expect(context).toHaveBeenCalledWith({ version: "1.3.0" });
   });
 
-  it("calls options with releaseCount 0 and skips context when all is true", async () => {
+  it("calls options with releaseCount 0 and skips context when init is true", async () => {
     write.mockReturnValue(createWriteGenerator(["full\n"]));
 
     await generateChangelog({
       from: null,
-      all: true,
+      init: true,
     });
 
     expect(options).toHaveBeenCalledWith({ releaseCount: 0 });
@@ -89,19 +89,19 @@ describe("generateChangelog", () => {
 
     await generateChangelog({
       from: "v1.0.0",
-      all: false,
+      init: false,
     });
 
     expect(commits).toHaveBeenCalledWith({ from: "v1.0.0" });
     expect(options).not.toHaveBeenCalled();
   });
 
-  it("does not call commits when all and from are both set", async () => {
+  it("does not call commits when init and from are both set", async () => {
     write.mockReturnValue(createWriteGenerator(["full\n"]));
 
     await generateChangelog({
       from: "v1.0.0",
-      all: true,
+      init: true,
     });
 
     expect(options).toHaveBeenCalledWith({ releaseCount: 0 });
@@ -116,7 +116,7 @@ describe("generateChangelog", () => {
       })(),
     );
 
-    await expect(generateChangelog({ from: null, all: false })).rejects.toThrow("write failed");
+    await expect(generateChangelog({ from: null, init: false })).rejects.toThrow("write failed");
   });
 
   it("returns empty string when write yields nothing", async () => {
@@ -124,7 +124,7 @@ describe("generateChangelog", () => {
 
     const result = await generateChangelog({
       from: null,
-      all: false,
+      init: false,
     });
 
     expect(result).toBe("");

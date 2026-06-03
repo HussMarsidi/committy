@@ -1,8 +1,8 @@
 export type GenerateOptions = {
-  /** Release version for prepend/bump; defaults to Unreleased when omitted. Ignored when `all` is true. */
+  /** Release version for bump; defaults to Unreleased when omitted. Ignored when `init` is true. */
   version?: string;
   from: string | null;
-  all: boolean;
+  init: boolean;
 };
 
 export async function generateChangelog(options: GenerateOptions): Promise<string> {
@@ -12,7 +12,7 @@ export async function generateChangelog(options: GenerateOptions): Promise<strin
   cc.readPackage();
   await cc.loadPreset("conventionalcommits");
 
-  if (options.all) {
+  if (options.init) {
     await cc.options({ releaseCount: 0 });
   } else {
     if (!options.from) {
@@ -21,7 +21,7 @@ export async function generateChangelog(options: GenerateOptions): Promise<strin
     await cc.context({ version: options.version ?? "Unreleased" });
   }
 
-  if (options.from && !options.all) {
+  if (options.from && !options.init) {
     cc.commits({ from: options.from });
   }
 

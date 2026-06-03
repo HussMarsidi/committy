@@ -33,13 +33,15 @@ describe("gcv bump", () => {
     const { exitCode, stdout } = await run(["bump"], dir);
 
     expect(exitCode).toBe(0);
-    expect(stdout).toContain("Changelog written to CHANGELOG.md");
     expect(stdout).toContain("Bumped 0.1.0 → 0.2.0 (minor)");
     expect(stdout).toContain("Tagged v0.2.0");
 
     expect(readPackageVersion(dir)).toBe("0.2.0");
     expect(existsSync(join(dir, "CHANGELOG.md"))).toBe(true);
-    expect(readFileSync(join(dir, "CHANGELOG.md"), "utf8")).toContain("0.2.0");
+    const changelog = readFileSync(join(dir, "CHANGELOG.md"), "utf8");
+    expect(changelog).toContain("0.2.0");
+    expect(changelog).toContain("0.1.0");
+    expect(changelog).not.toMatch(/^## (?:\[Unreleased\]|Unreleased\b)/m);
 
     const tags = execSync("git tag -l", { cwd: dir }).toString().trim().split("\n");
     expect(tags).toContain("v0.2.0");

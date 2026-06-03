@@ -25,31 +25,25 @@ export function stripLeadingUnreleasedSection(content: string): string {
   return lines.slice(nextSection).join("\n").replace(/^\n+/, "");
 }
 
-export type WriteOptions = {
-  content: string;
-  dryRun: boolean;
-  all: boolean;
-  filePath?: string;
-};
+/** Writes changelog content to disk (no stdout). Used by bump for bootstrap. */
+export async function writeChangelogFile(
+  content: string,
+  filePath?: string,
+): Promise<void> {
+  const target = filePath ?? path.join(process.cwd(), "CHANGELOG.md");
+  await writeFile(target, content);
+}
 
-export async function writeChangelog(options: WriteOptions): Promise<void> {
-  const { content, dryRun, all } = options;
-  const filePath = options.filePath ?? path.join(process.cwd(), "CHANGELOG.md");
-
-  if (dryRun) {
-    process.stdout.write(content);
-    return;
-  }
-
-  if (all) {
-    await writeFile(filePath, content);
-    console.log("Changelog written to CHANGELOG.md");
-    return;
-  }
+/** Writes a release section for `gcv bump` (prepends, replaces stale Unreleased). */
+export async function writeReleaseChangelog(
+  content: string,
+  filePath?: string,
+): Promise<void> {
+  const target = filePath ?? path.join(process.cwd(), "CHANGELOG.md");
 
   let existing = "";
   try {
-    existing = await readFile(filePath, "utf8");
+    existing = await readFile(target, "utf8");
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
       throw error;
@@ -62,6 +56,5 @@ export async function writeChangelog(options: WriteOptions): Promise<void> {
   const combined = existingWithoutUnreleased
     ? `${content}\n${existingWithoutUnreleased}`
     : content;
-  await writeFile(filePath, combined);
-  console.log("Changelog written to CHANGELOG.md");
+  await writeFile(target, combined);
 }

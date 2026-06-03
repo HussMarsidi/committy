@@ -16,16 +16,14 @@ Commands:
   gcv                          Interactive commit prompt
   gcv init                     Scaffold .gc.json in current directory
   gcv branch                   Create or validate a branch name
-  gcv changelog                Generate CHANGELOG.md from git history
+  gcv changelog                Preview changelog from git history (stdout)
   gcv bump                     Bump version, update changelog, commit and tag
   gcv --help                   Show this help
   gcv --version                Show version
 
 Changelog:
-  gcv changelog                Prepend unreleased commits to CHANGELOG.md
-  gcv changelog --dry-run      Print to stdout, no file written
-  gcv changelog --from v1.0.0  Generate from a specific tag
-  gcv changelog --all          Regenerate entire changelog from scratch
+  gcv changelog                Preview unreleased commits (stdout only)
+  gcv changelog --from v1.0.0  Preview from a specific tag
 
 Bump:
   gcv bump                     Auto-detect bump type from commits

@@ -6,7 +6,11 @@ vi.mock("node:fs/promises", () => ({
 }));
 
 import { readFile, writeFile } from "node:fs/promises";
-import { stripLeadingUnreleasedSection, writeChangelog } from "./write.js";
+import {
+  stripLeadingUnreleasedSection,
+  writeChangelogFile,
+  writeReleaseChangelog,
+} from "./write.js";
 
 describe("stripLeadingUnreleasedSection", () => {
   it("removes a leading Unreleased block", () => {
@@ -25,53 +29,22 @@ describe("stripLeadingUnreleasedSection", () => {
   });
 });
 
-describe("writeChangelog", () => {
-  const stdoutSpy = vi.spyOn(process.stdout, "write").mockImplementation(() => true);
+describe("writeReleaseChangelog", () => {
   const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
   beforeEach(() => {
     vi.clearAllMocks();
-    stdoutSpy.mockClear();
     logSpy.mockClear();
   });
 
-  it("writes to stdout on dry run without touching file", async () => {
-    await writeChangelog({
-      content: "## Unreleased\n",
-      dryRun: true,
-      all: false,
-      filePath: "/tmp/CHANGELOG.md",
-    });
-
-    expect(stdoutSpy).toHaveBeenCalledWith("## Unreleased\n");
-    expect(writeFile).not.toHaveBeenCalled();
-    expect(logSpy).not.toHaveBeenCalled();
-  });
-
-  it("overwrites file when all is true", async () => {
-    await writeChangelog({
-      content: "## Full\n",
-      dryRun: false,
-      all: true,
-      filePath: "/tmp/CHANGELOG.md",
-    });
-
-    expect(writeFile).toHaveBeenCalledWith("/tmp/CHANGELOG.md", "## Full\n");
-    expect(logSpy).toHaveBeenCalledWith("Changelog written to CHANGELOG.md");
-  });
-
-  it("prepends to existing file by default", async () => {
+  it("prepends to existing file", async () => {
     vi.mocked(readFile).mockResolvedValue("## Old\n");
 
-    await writeChangelog({
-      content: "## New",
-      dryRun: false,
-      all: false,
-      filePath: "/tmp/CHANGELOG.md",
-    });
+    await writeReleaseChangelog("## New", "/tmp/CHANGELOG.md");
 
     expect(readFile).toHaveBeenCalledWith("/tmp/CHANGELOG.md", "utf8");
     expect(writeFile).toHaveBeenCalledWith("/tmp/CHANGELOG.md", "## New\n## Old\n");
+    expect(logSpy).not.toHaveBeenCalled();
   });
 
   it("replaces an existing Unreleased section instead of duplicating it", async () => {
@@ -79,12 +52,7 @@ describe("writeChangelog", () => {
       "## Unreleased\n\n* old feat\n\n## 1.0.0\n\n* shipped\n",
     );
 
-    await writeChangelog({
-      content: "## Unreleased\n\n* new feat",
-      dryRun: false,
-      all: false,
-      filePath: "/tmp/CHANGELOG.md",
-    });
+    await writeReleaseChangelog("## Unreleased\n\n* new feat", "/tmp/CHANGELOG.md");
 
     expect(writeFile).toHaveBeenCalledWith(
       "/tmp/CHANGELOG.md",
@@ -96,13 +64,20 @@ describe("writeChangelog", () => {
     const enoent = Object.assign(new Error("ENOENT"), { code: "ENOENT" });
     vi.mocked(readFile).mockRejectedValue(enoent);
 
-    await writeChangelog({
-      content: "## New",
-      dryRun: false,
-      all: false,
-      filePath: "/tmp/CHANGELOG.md",
-    });
+    await writeReleaseChangelog("## New", "/tmp/CHANGELOG.md");
 
     expect(writeFile).toHaveBeenCalledWith("/tmp/CHANGELOG.md", "## New");
+  });
+});
+
+describe("writeChangelogFile", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("writes content without logging", async () => {
+    await writeChangelogFile("## Full\n", "/tmp/CHANGELOG.md");
+
+    expect(writeFile).toHaveBeenCalledWith("/tmp/CHANGELOG.md", "## Full\n");
   });
 });

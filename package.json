@@ -17,7 +17,6 @@
     "test:watch": "vitest",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "changelog": "node dist/index.js changelog",
-    "changelog:dry": "node dist/index.js changelog --dry-run",
     "bump": "node dist/index.js bump",
     "bump:minor": "node dist/index.js bump --minor",
     "bump:major": "node dist/index.js bump --major",

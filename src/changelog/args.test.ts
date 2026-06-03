@@ -17,50 +17,31 @@ describe("parseChangelogArgs", () => {
 
   it("returns defaults for empty args", () => {
     expect(parseChangelogArgs([])).toEqual({
-      dryRun: false,
       from: null,
-      all: false,
-    });
-  });
-
-  it("parses --dry-run", () => {
-    expect(parseChangelogArgs(["--dry-run"])).toEqual({
-      dryRun: true,
-      from: null,
-      all: false,
     });
   });
 
   it("parses --from with value", () => {
     expect(parseChangelogArgs(["--from", "v1.0.0"])).toEqual({
-      dryRun: false,
       from: "v1.0.0",
-      all: false,
     });
   });
 
-  it("parses --all", () => {
-    expect(parseChangelogArgs(["--all"])).toEqual({
-      dryRun: false,
-      from: null,
-      all: true,
-    });
+  it("rejects --dry-run", () => {
+    expect(() => parseChangelogArgs(["--dry-run"])).toThrow(/process\.exit/);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("always prints to stdout"),
+    );
   });
 
-  it("--all wins over --from", () => {
-    expect(parseChangelogArgs(["--all", "--from", "v1.0.0"])).toEqual({
-      dryRun: false,
-      from: null,
-      all: true,
-    });
-  });
+  it("rejects --init and --all", () => {
+    expect(() => parseChangelogArgs(["--init"])).toThrow(/process\.exit/);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("preview-only"));
 
-  it("combines --dry-run and --all", () => {
-    expect(parseChangelogArgs(["--dry-run", "--all"])).toEqual({
-      dryRun: true,
-      from: null,
-      all: true,
-    });
+    errorSpy.mockClear();
+    expect(() => parseChangelogArgs(["--all"])).toThrow(/process\.exit/);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("preview-only"));
   });
 
   it("exits when --from has no value", () => {

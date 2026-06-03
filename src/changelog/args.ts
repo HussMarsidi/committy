@@ -1,25 +1,25 @@
 export type ChangelogArgs = {
-  dryRun: boolean;
   from: string | null;
-  all: boolean;
 };
 
 export function parseChangelogArgs(args: string[]): ChangelogArgs {
-  let dryRun = false;
   let from: string | null = null;
-  let all = false;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
 
     if (arg === "--dry-run") {
-      dryRun = true;
-      continue;
+      console.error(
+        "gcv changelog always prints to stdout. Use gcv bump to write CHANGELOG.md.",
+      );
+      process.exit(1);
     }
 
-    if (arg === "--all") {
-      all = true;
-      continue;
+    if (arg === "--all" || arg === "--init") {
+      console.error(
+        "gcv changelog is preview-only. Use gcv bump to create or update CHANGELOG.md.",
+      );
+      process.exit(1);
     }
 
     if (arg === "--from") {
@@ -37,9 +37,5 @@ export function parseChangelogArgs(args: string[]): ChangelogArgs {
     process.exit(1);
   }
 
-  if (all) {
-    from = null;
-  }
-
-  return { dryRun, from, all };
+  return { from };
 }

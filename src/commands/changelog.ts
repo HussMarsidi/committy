@@ -1,6 +1,5 @@
 import { parseChangelogArgs } from "../changelog/args.js";
 import { generateChangelog } from "../changelog/generate.js";
-import { writeChangelog } from "../changelog/write.js";
 import { fetchRemoteTags, isGitRepo } from "../bump/git.js";
 
 export async function runChangelogCommand(args: string[]): Promise<void> {
@@ -11,14 +10,14 @@ export async function runChangelogCommand(args: string[]): Promise<void> {
 
   fetchRemoteTags();
 
-  const { dryRun, from, all } = parseChangelogArgs(args);
+  const { from } = parseChangelogArgs(args);
 
-  const content = await generateChangelog({ from, all });
+  const content = await generateChangelog({ from, init: false });
 
   if (!content.trim()) {
     console.log("No releasable commits found.");
     process.exit(0);
   }
 
-  await writeChangelog({ content, dryRun, all });
+  process.stdout.write(content);
 }

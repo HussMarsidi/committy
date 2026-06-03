@@ -107,13 +107,13 @@ v0.2 adds two optional init steps: branch naming config and git hook installatio
 
 If you're not at the repo root, committy warns you before writing.
 
-### Generate a changelog
+### Preview or bootstrap a changelog
 
 ```bash
 gcv changelog
 ```
 
-Generates `CHANGELOG.md` from commits since the last git tag. Prepends to any existing file. Use `--from <tag>` to start from a specific tag, `--all` to regenerate the full history, or `--dry-run` to preview without writing.
+Prints unreleased commits since the last git tag to stdout (no file written). Use `--from <tag>` to preview from a specific tag. **`gcv bump` is the only command that writes `CHANGELOG.md`** — on the first run it bootstraps full tagged history automatically if the file is missing.
 
 ### Bump the version
 
@@ -245,17 +245,15 @@ If cwd is inside a git repo but not the root, committy asks for confirmation bef
 
 ### `gcv changelog`
 
-Generates `CHANGELOG.md` from commits since the last git tag. Prepends to any existing changelog. Only commits following the Conventional Commits convention appear in the output.
+Previews changelog markdown on stdout. Only commits following the Conventional Commits convention appear in the output. Never writes `CHANGELOG.md`.
 
 | Flag | Description |
 | --- | --- |
-| `--from <tag>` | Start range from a specific git tag or commit |
-| `--all` | Regenerate full history from all commits |
-| `--dry-run` | Print output to stdout — no file written |
+| `--from <tag>` | Preview from a specific git tag or commit |
 
 ### `gcv bump`
 
-Auto-detects the semver bump type from commits since the last tag, generates the changelog, bumps `package.json` (if present), commits, and creates a git tag.
+Auto-detects the semver bump type from commits since the last tag, generates the changelog, bumps `package.json` (if present), commits, and creates a git tag. If `CHANGELOG.md` does not exist, full tagged history is written first, then the new release section is prepended — no extra flags or setup step.
 
 Bump type inference: `feat` → minor, `fix` / `chore` / others → patch, breaking change footer → major.
 
