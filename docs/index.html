@@ -14,8 +14,9 @@
         --accent: #7ee787;
         --accent-dim: #1a2e1a;
         --code-bg: #111;
-        --tag-done: #238636;
-        --tag-upcoming: #2d2d2d;
+        --warn-bg: #1f1a00;
+        --warn-border: #4a3c00;
+        --warn-text: #e3b341;
       }
 
       * {
@@ -105,18 +106,6 @@
         text-align: center;
       }
 
-      .hero-badge {
-        display: inline-block;
-        background: var(--accent-dim);
-        color: var(--accent);
-        border: 1px solid #2a4a2a;
-        font-family: monospace;
-        font-size: 12px;
-        padding: 3px 10px;
-        border-radius: 20px;
-        margin-bottom: 24px;
-      }
-
       h1 {
         font-size: 52px;
         font-weight: 700;
@@ -192,201 +181,72 @@
         text-decoration: none;
       }
 
-      /* ── About ── */
-      #about h2 {
+      /* ── Section headings ── */
+      .section-heading {
         font-size: 26px;
         font-weight: 600;
-        margin-bottom: 16px;
-      }
-
-      #about p {
-        color: #bbb;
-        margin-bottom: 12px;
-      }
-
-      .feature-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-top: 32px;
-      }
-
-      .feature-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 18px 20px;
-      }
-
-      .feature-card .icon {
-        font-size: 18px;
         margin-bottom: 8px;
       }
 
-      .feature-card h3 {
+      .section-sub {
+        color: var(--muted);
         font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 4px;
-      }
-
-      .feature-card p {
-        color: var(--muted);
-        font-size: 13px;
-        margin: 0;
-      }
-
-      /* ── Roadmap ── */
-      #roadmap h2 {
-        font-size: 26px;
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-
-      #roadmap .section-sub {
-        color: var(--muted);
         margin-bottom: 40px;
-        font-size: 14px;
       }
 
-      .timeline {
-        position: relative;
-        padding-left: 28px;
-      }
-
-      .timeline::before {
-        content: "";
-        position: absolute;
-        left: 7px;
-        top: 8px;
-        bottom: 8px;
-        width: 1px;
-        background: var(--border);
-      }
-
-      .milestone {
-        position: relative;
-        margin-bottom: 36px;
-      }
-      .milestone:last-child {
-        margin-bottom: 0;
-      }
-
-      .milestone-dot {
-        position: absolute;
-        left: -28px;
-        top: 8px;
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
-        border: 2px solid var(--border);
-        background: var(--bg);
-      }
-
-      .milestone.done .milestone-dot {
-        background: var(--accent);
-        border-color: var(--accent);
-      }
-
-      .milestone.wip .milestone-dot {
-        background: #e3b341;
-        border-color: #e3b341;
-      }
-
-      .milestone-header {
+      /* ── Tabs ── */
+      .tab-bar {
         display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
+        gap: 0;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 28px;
       }
 
-      .milestone-version {
-        font-family: monospace;
+      .tab-btn {
+        padding: 9px 18px;
         font-size: 13px;
-        font-weight: 600;
+        font-weight: 500;
+        color: var(--muted);
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+        cursor: pointer;
+        transition: color 0.15s;
+        font-family: inherit;
+      }
+
+      .tab-btn:hover {
         color: var(--text);
       }
 
-      .milestone-title {
-        font-size: 14px;
-        color: var(--muted);
-      }
-
-      .tag {
-        font-size: 11px;
-        padding: 2px 8px;
-        border-radius: 20px;
-        font-weight: 500;
-      }
-
-      .tag-done {
-        background: #1a3a1a;
+      .tab-btn.active {
         color: var(--accent);
-        border: 1px solid #2a5a2a;
+        border-bottom-color: var(--accent);
       }
 
-      .tag-upcoming {
-        background: var(--tag-upcoming);
-        color: var(--muted);
-        border: 1px solid #333;
+      .tab-pane {
+        display: none;
       }
 
-      .tag-wip {
-        background: #2d2500;
-        color: #e3b341;
-        border: 1px solid #4a3c00;
+      .tab-pane.active {
+        display: block;
       }
 
-      .milestone-items {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-
-      .milestone-items li {
-        font-size: 13px;
-        color: #aaa;
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-      }
-
-      .milestone-items li::before {
-        content: "·";
-        color: var(--muted);
-        flex-shrink: 0;
-        margin-top: 1px;
-      }
-
-      .milestone.done .milestone-items li {
-        color: #ccc;
-      }
-
-      /* ── Docs ── */
-      #docs h2 {
-        font-size: 26px;
-        font-weight: 600;
-        margin-bottom: 32px;
-      }
-
-      .doc-section {
-        margin-bottom: 48px;
-      }
-
-      .doc-section h3 {
-        font-size: 17px;
-        font-weight: 600;
-        margin-bottom: 12px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid var(--border);
-      }
-
-      .doc-section p {
+      .tab-desc {
         color: #bbb;
-        margin-bottom: 12px;
         font-size: 14px;
+        margin-bottom: 20px;
+        max-width: 600px;
       }
 
+      .tab-note {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 10px;
+      }
+
+      /* ── Code ── */
       pre {
         background: var(--code-bg);
         border: 1px solid var(--border);
@@ -415,11 +275,77 @@
         color: var(--accent);
       }
 
-      .comment {
-        color: #636e7b;
+      .comment { color: #636e7b; }
+      .cmd-output { color: #7ee787; }
+      .prompt-q { color: #79b8ff; }
+
+      /* ── Gotcha callout ── */
+      .gotcha {
+        background: var(--warn-bg);
+        border: 1px solid var(--warn-border);
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin: 16px 0;
       }
-      .cmd-output {
-        color: #7ee787;
+
+      .gotcha-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--warn-text);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+      }
+
+      .gotcha p {
+        color: #ccc;
+        font-size: 13px;
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      .gotcha code {
+        background: #2d2500;
+        border: 1px solid var(--warn-border);
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: var(--warn-text);
+      }
+
+      /* ── Reference ── */
+      .ref-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 20px;
+        margin-bottom: 44px;
+      }
+
+      .ref-nav a {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .ref-nav a:hover {
+        color: var(--text);
+      }
+
+      .doc-section {
+        margin-bottom: 52px;
+      }
+
+      .doc-section h3 {
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .doc-section p {
+        color: #bbb;
+        margin-bottom: 12px;
+        font-size: 14px;
       }
 
       .table-wrap {
@@ -480,26 +406,23 @@
         h1 {
           font-size: 36px;
         }
-        .feature-grid {
-          grid-template-columns: 1fr;
+        .tab-btn {
+          padding: 9px 12px;
+          font-size: 12px;
         }
       }
     </style>
   </head>
   <body>
+
     <!-- Nav -->
     <nav>
       <div class="inner">
         <span class="logo">committy</span>
         <ul class="links">
-          <li><a href="#about">About</a></li>
-          <li><a href="#roadmap">Roadmap</a></li>
-          <li><a href="#docs">Docs</a></li>
-          <li>
-            <a href="https://github.com/hussmarsidi/committy" target="_blank"
-              >GitHub ↗</a
-            >
-          </li>
+          <li><a href="#scenarios">Scenarios</a></li>
+          <li><a href="#reference">Reference</a></li>
+          <li><a href="https://github.com/HussMarsidi/committy" target="_blank">GitHub ↗</a></li>
         </ul>
       </div>
     </nav>
@@ -510,17 +433,17 @@
         <h1>committy <span>gcv</span></h1>
         <p class="hero-sub">
           A lightweight global CLI for conventional commits. Install once, use
-          in any repo.
+          in any repo — no per-project config needed.
         </p>
         <div class="install-block">
           <span class="dollar">$</span>
           <span class="cmd">npm install -g @hussmarsidi/committy</span>
         </div>
         <div class="hero-links">
-          <a class="btn btn-primary" href="#docs">Get started</a>
+          <a class="btn btn-primary" href="#scenarios">Get started</a>
           <a
             class="btn btn-ghost"
-            href="https://github.com/hussmarsidi/committy"
+            href="https://github.com/HussMarsidi/committy"
             target="_blank"
             >View on GitHub</a
           >
@@ -528,186 +451,172 @@
       </div>
     </section>
 
-    <!-- About -->
-    <section id="about">
+    <!-- Scenarios -->
+    <section id="scenarios">
       <div class="container">
-        <h2>What is committy?</h2>
-        <p>
-          committy (<code>gcv</code>) is a global CLI tool that brings structure
-          to your git commits without locking you into a project setup. You
-          install it once and it works everywhere — with or without a config
-          file.
-        </p>
-        <p>
-          Run <code>gcv</code> for an interactive prompt, or commit inline in
-          one line. When you're working with a team, drop a
-          <code>.gc.json</code> in the repo root to share types, scopes, and
-          team prefixes — and committy picks it up automatically.
-        </p>
-        <div class="feature-grid">
-          <div class="feature-card">
-            <div class="icon">⚡</div>
-            <h3>Interactive + inline</h3>
-            <p>
-              Guided prompt when you need it. One-liner when you don't. Falls
-              back gracefully when args are partial.
-            </p>
-          </div>
-          <div class="feature-card">
-            <div class="icon">🌍</div>
-            <h3>Global install</h3>
-            <p>
-              No per-project config required. Works in any git repo the moment
-              you install it.
-            </p>
-          </div>
-          <div class="feature-card">
-            <div class="icon">👥</div>
-            <h3>Team-ready</h3>
-            <p>
-              Share commit types, scopes, and team prefixes via a single
-              <code>.gc.json</code> config file.
-            </p>
-          </div>
-          <div class="feature-card">
-            <div class="icon">🔍</div>
-            <h3>Config resolution</h3>
-            <p>
-              Walks up from your current directory to find the nearest config.
-              Sensible defaults if none found.
-            </p>
-          </div>
+        <h2 class="section-heading">How people use it</h2>
+        <p class="section-sub">Pick the scenario that matches your setup.</p>
+
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="solo">Solo dev</button>
+          <button class="tab-btn" data-tab="team">Team setup</button>
+          <button class="tab-btn" data-tab="release">Release workflow</button>
         </div>
-      </div>
-    </section>
 
-    <!-- Roadmap -->
-    <section id="roadmap">
-      <div class="container">
-        <h2>Roadmap</h2>
-        <p class="section-sub">What's shipped and what's coming next.</p>
-        <div class="timeline">
-          <div class="milestone done">
-            <div class="milestone-dot"></div>
-            <div class="milestone-header">
-              <span class="milestone-version">v0.1</span>
-              <span class="milestone-title">Commit convention</span>
-              <span class="tag tag-done">Launched</span>
-            </div>
-            <ul class="milestone-items">
-              <li>
-                <code>gcv commit</code> — interactive + inline with graceful
-                fallback
-              </li>
-              <li>
-                <code>gcv init</code> — scaffolds <code>.gc.json</code> with
-                commits section
-              </li>
-              <li>Team prefix per scope</li>
-              <li>Staged files check</li>
-              <li>Default types when no config</li>
-            </ul>
-          </div>
-
-          <div class="milestone done">
-            <div class="milestone-dot"></div>
-            <div class="milestone-header">
-              <span class="milestone-version">v0.2</span>
-              <span class="milestone-title">Branch convention</span>
-              <span class="tag tag-done">Launched</span>
-            </div>
-            <ul class="milestone-items">
-              <li>
-                <code>gcv branch</code> — interactive creator, inline create,
-                <code>validate</code> subcommand
-              </li>
-              <li>
-                Branch pattern validation against <code>branches</code> config
-                in <code>.gc.json</code>
-              </li>
-              <li>
-                <code>gcv init</code> — optional branches section and git hook
-                installation (Husky or <code>core.hooksPath</code>)
-              </li>
-            </ul>
-          </div>
-
-          <div class="milestone done">
-            <div class="milestone-dot"></div>
-            <div class="milestone-header">
-              <span class="milestone-version">v0.3</span>
-              <span class="milestone-title">Changelog &amp; versioning</span>
-              <span class="tag tag-done">Launched</span>
-            </div>
-            <ul class="milestone-items">
-              <li><code>gcv changelog</code> — generates CHANGELOG.md from git log</li>
-              <li><code>--from &lt;tag&gt;</code>, <code>--dry-run</code>, <code>--all</code> flags</li>
-              <li><code>gcv bump</code> — semver auto-detect from commits since last tag</li>
-              <li><code>--major</code>, <code>--minor</code>, <code>--patch</code> overrides; <code>--dry-run</code>, <code>--no-tag</code> flags</li>
-              <li>Writes changelog, bumps <code>package.json</code>, commits, and creates git tag</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Docs -->
-    <section id="docs">
-      <div class="container">
-        <h2>Documentation</h2>
-
-        <div class="doc-section">
-          <h3>Quick start</h3>
-          <p>You need Node 18+ and a git repo with staged files.</p>
-          <pre><code><span class="comment"># 1. Install globally</span>
+        <!-- Solo dev -->
+        <div class="tab-pane active" id="tab-solo">
+          <p class="tab-desc">
+            Install globally, stage your changes, and run <code>gcv</code>.
+            No config file required — committy uses conventional commit defaults
+            out of the box.
+          </p>
+          <pre><code><span class="comment"># Install once</span>
 npm install -g @hussmarsidi/committy
 
-<span class="comment"># 2. Stage your changes</span>
+<span class="comment"># Stage your changes</span>
 git add .
 
-<span class="comment"># 3. Run the interactive prompt</span>
-gcv</code></pre>
-          <p>
-            You'll be guided through type → scope → message. committy runs
-            <code>git commit</code> for you.
+<span class="comment"># Run the interactive prompt</span>
+gcv
+
+<span class="prompt-q">? Type:</span>    feat
+<span class="prompt-q">? Scope:</span>   <span class="comment">(optional, press Enter to skip)</span>
+<span class="prompt-q">? Message:</span> add dark mode toggle
+
+<span class="cmd-output">→ git commit -m "feat: add dark mode toggle"</span></code></pre>
+          <p class="tab-note">
+            In a hurry? Skip the prompt entirely:
+            <code>gcv feat add dark mode toggle</code>
           </p>
         </div>
 
-        <div class="doc-section">
-          <h3>Commit — interactive</h3>
-          <p>
-            Run <code>gcv</code> with no arguments to open the guided prompt.
-            Scope is always optional — skipping it produces
-            <code>feat: message</code>, not <code>feat(): message</code>.
+        <!-- Team setup -->
+        <div class="tab-pane" id="tab-team">
+          <p class="tab-desc">
+            Run <code>gcv init</code> at your repo root to scaffold a shared
+            config. Commit <code>.gc.json</code> and every developer gets the
+            same types, scopes, branch rules, and git hooks automatically on
+            <code>npm install</code>.
           </p>
-          <pre><code>gcv
+          <pre><code>gcv init
 
-<span class="comment"># Prompt:</span>
-<span class="cmd-output">? Type:    feat
-? Scope:   (optional, press Enter to skip)
-? Message: fix svg images not loading</span>
+<span class="prompt-q">? Add default conventional commit types?</span> Yes
+<span class="prompt-q">? Add scopes now?</span> Yes
+  <span class="prompt-q">? Scope name:</span> api
+  <span class="prompt-q">? Team prefix (optional, press Enter to skip):</span> BACKEND
+  <span class="prompt-q">? Add another scope?</span> Yes
+  <span class="prompt-q">? Scope name:</span> web
+  <span class="prompt-q">? Team prefix (optional, press Enter to skip):</span> FRONTEND
+  <span class="prompt-q">? Add another scope?</span> No
+<span class="prompt-q">? Add branch naming conventions?</span> Yes
+<span class="prompt-q">? Add default branch types?</span> Yes
+<span class="prompt-q">? Add custom patterns?</span> No
+<span class="prompt-q">? Install git hooks for branch validation?</span> Yes
 
-<span class="comment"># Result:</span>
-<span class="cmd-output">git commit -m "feat: fix svg images not loading"</span></code></pre>
+<span class="cmd-output">Created .gc.json
+Installed git hooks (core.hooksPath): .gc/hooks
+  wrote .gc/hooks/post-checkout</span></code></pre>
+
+          <p class="tab-desc" style="margin-top: 20px;">
+            Once the config is committed, scope-based commits include the team
+            prefix automatically:
+          </p>
+          <pre><code>gcv feat api add rate limiting
+
+<span class="cmd-output">→ git commit -m "feat(api): BACKEND add rate limiting"</span></code></pre>
+          <p class="tab-note">
+            Team prefixes are useful when downstream tooling (Jira, Linear,
+            Slack integrations) parses commit messages by team. Scopes without
+            a prefix produce <code>feat(web): message</code> as normal.
+          </p>
         </div>
 
-        <div class="doc-section">
-          <h3>Commit — inline</h3>
-          <p>
-            Pass type, scope, and message directly as arguments for a fast
-            one-liner. If args are partial or invalid, committy drops into the
-            prompt with valid fields pre-filled.
+        <!-- Release workflow -->
+        <div class="tab-pane" id="tab-release">
+          <p class="tab-desc">
+            After shipping features, <code>gcv bump</code> reads your commits,
+            infers the semver type, writes the changelog, bumps
+            <code>package.json</code>, commits, and tags — one command.
           </p>
-          <pre><code><span class="comment"># type + scope + message</span>
-gcv feat auth fix svg images not loading
-<span class="cmd-output">→ git commit -m "feat(auth): fix svg images not loading"</span>
+          <pre><code><span class="comment"># Working tree must be clean before running</span>
+gcv bump
 
-<span class="comment"># type + message (no scope)</span>
+<span class="cmd-output">Fetching remote tags...
+Detected: minor
+Current:  1.3.0
+Next:     1.4.0
+
+Bumped 1.3.0 → 1.4.0 (minor)
+Tagged v1.4.0</span>
+
+<span class="comment"># The release commit committy creates:</span>
+git log --oneline -3
+<span class="cmd-output">a1b2c3d chore(release): v1.4.0
+e4f5g6h feat(api): add rate limiting
+i7j8k9l fix(web): resolve broken avatar upload</span></code></pre>
+          <p class="tab-note">
+            The release commit is <code>chore(release): v1.4.0</code> — a
+            conventional commit — so it won't surface as a feature or fix in
+            your next changelog.
+          </p>
+          <p class="tab-note" style="margin-top: 8px;">
+            Not sure what's about to happen? Run
+            <code>gcv bump --dry-run</code> first.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reference -->
+    <section id="reference">
+      <div class="container">
+        <h2 class="section-heading">Reference</h2>
+
+        <div class="ref-nav">
+          <a href="#ref-commit">Commit</a>
+          <a href="#ref-branch">Branch</a>
+          <a href="#ref-changelog">Changelog</a>
+          <a href="#ref-bump">Bump</a>
+          <a href="#ref-init">Init</a>
+          <a href="#ref-config">Config</a>
+          <a href="#ref-commands">All commands</a>
+        </div>
+
+        <!-- Commit -->
+        <div class="doc-section" id="ref-commit">
+          <h3>Commit</h3>
+          <p>
+            Run <code>gcv</code> with no arguments for the interactive prompt.
+            Pass arguments to commit inline — committy falls back to the prompt
+            for any missing fields.
+          </p>
+          <pre><code><span class="comment"># Interactive</span>
+gcv
+
+<span class="comment"># Inline: type + message</span>
 gcv fix update readme
-<span class="cmd-output">→ git commit -m "fix: update readme"</span></code></pre>
+<span class="cmd-output">→ git commit -m "fix: update readme"</span>
 
-          <p>Argument parsing rules:</p>
-          <div class="table-wrap">
+<span class="comment"># Inline: type + scope + message (3 args — always unambiguous)</span>
+gcv feat auth add login page
+<span class="cmd-output">→ git commit -m "feat(auth): add login page"</span></code></pre>
+
+          <div class="gotcha">
+            <div class="gotcha-label">⚠ Heads up — 2-arg behavior</div>
+            <p>
+              With exactly 2 args, the second token is checked against your
+              configured scopes. If it matches a scope, committy treats it as
+              the scope and prompts for a message. If it doesn't match, it's
+              treated as the message.
+              <br /><br />
+              Example: <code>gcv fix auth</code> — if <code>auth</code> is a
+              configured scope, you'll be prompted for a message instead of
+              committing. Use 3 args to be explicit:
+              <code>gcv fix auth &lt;message&gt;</code>.
+            </p>
+          </div>
+
+          <div class="table-wrap" style="margin-top: 16px;">
             <table>
               <thead>
                 <tr>
@@ -717,79 +626,62 @@ gcv fix update readme
               </thead>
               <tbody>
                 <tr>
-                  <td>1 arg</td>
-                  <td>message only — prompts for type and scope</td>
+                  <td>gcv</td>
+                  <td>interactive prompt</td>
                 </tr>
                 <tr>
-                  <td>2 args</td>
-                  <td>
-                    type + scope (if scope matches config), or type + message
-                  </td>
+                  <td>gcv &lt;type&gt; &lt;message&gt;</td>
+                  <td>type + message — when 2nd arg is not a known scope</td>
                 </tr>
                 <tr>
-                  <td>3+ args</td>
-                  <td>type + scope + message (rest joined with spaces)</td>
+                  <td>gcv &lt;type&gt; &lt;scope&gt;</td>
+                  <td>type + scope — prompts for message when 2nd arg is a known scope</td>
+                </tr>
+                <tr>
+                  <td>gcv &lt;type&gt; &lt;scope&gt; &lt;message...&gt;</td>
+                  <td>type + scope + message — explicit, no ambiguity</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <div class="doc-section">
-          <h3>Branch — interactive</h3>
+        <!-- Branch -->
+        <div class="doc-section" id="ref-branch">
+          <h3>Branch</h3>
           <p>
-            Run <code>gcv branch</code> with no arguments to open the guided
-            branch name builder. It reads your <code>branches</code> config,
-            prompts for each placeholder in the selected pattern, and runs
-            <code>git switch -c</code> with the validated name.
+            Interactive branch name builder that reads your
+            <code>branches</code> config, prompts for each placeholder, and
+            runs <code>git switch -c</code>. Pass a full name inline to skip
+            the prompt.
           </p>
-          <pre><code>gcv branch
+          <pre><code><span class="comment"># Interactive — guided by your branch config</span>
+gcv branch
 
-<span class="comment"># Prompt (using pattern "{type}/{description}"):</span>
-<span class="cmd-output">? Pattern:     {type}/{description}
-? Type:        feat
-? Description: add-login-page</span>
+<span class="prompt-q">? Pattern:</span>     {type}/{description}
+<span class="prompt-q">? Type:</span>        feat
+<span class="prompt-q">? Description:</span> add-login-page
 
-<span class="comment"># Result:</span>
-<span class="cmd-output">git switch -c feat/add-login-page</span></code></pre>
-          <p>
-            If your config has multiple patterns you'll be asked to pick one
-            first. Description input is auto-kebab-cased — spaces become
-            hyphens, uppercase is lowered.
-          </p>
-        </div>
-
-        <div class="doc-section">
-          <h3>Branch — inline</h3>
-          <p>
-            Pass the full branch name directly to skip the prompt. committy
-            validates it against your config before creating the branch.
-          </p>
-          <pre><code><span class="comment"># Inline create — validates then runs git switch -c</span>
-gcv branch feat/add-login-page
 <span class="cmd-output">→ git switch -c feat/add-login-page</span>
 
-<span class="comment"># With ticket pattern</span>
-gcv branch feat/PROJ-123-add-login-page
-<span class="cmd-output">→ git switch -c feat/PROJ-123-add-login-page</span>
+<span class="comment"># Inline — validates against config, then creates</span>
+gcv branch feat/add-login-page
+<span class="cmd-output">→ git switch -c feat/add-login-page</span>
 
 <span class="comment"># Validate only — exits 0 or 1, no branch created</span>
 gcv branch validate feat/add-login-page</code></pre>
           <p>
             If no <code>branches</code> config is present, inline create still
-            works — it just skips validation.
+            works — it just skips validation. Description input is
+            auto-kebab-cased: spaces become hyphens, uppercase is lowered.
           </p>
-        </div>
-
-        <div class="doc-section">
-          <h3>Branch — git hooks</h3>
           <p>
-            During <code>gcv init</code>, you can install a
-            <code>post-checkout</code> hook that validates branch names
-            automatically — even when someone bypasses
-            <code>gcv branch</code> and uses <code>git switch</code> directly.
+            The <code>post-checkout</code> hook installed by
+            <code>gcv init</code> validates branch names even when someone uses
+            <code>git switch</code> directly, bypassing <code>gcv branch</code>.
+            If <code>gcv</code> isn't installed on a machine, the hook exits
+            cleanly — it never breaks the workflow.
           </p>
-          <p>committy detects your setup and adapts:</p>
           <div class="table-wrap">
             <table>
               <thead>
@@ -803,7 +695,8 @@ gcv branch validate feat/add-login-page</code></pre>
                   <td>No Husky</td>
                   <td>
                     <code>.gc/hooks/post-checkout</code> +
-                    <code>prepare</code> script sets <code>core.hooksPath</code>
+                    <code>prepare</code> script sets
+                    <code>core.hooksPath</code>
                   </td>
                 </tr>
                 <tr>
@@ -816,44 +709,181 @@ gcv branch validate feat/add-login-page</code></pre>
               </tbody>
             </table>
           </div>
+        </div>
+
+        <!-- Changelog -->
+        <div class="doc-section" id="ref-changelog">
+          <h3>Changelog</h3>
           <p>
-            Commit the <code>.gc/hooks/</code> directory. Every developer who
-            runs <code>npm install</code> after the PR merges gets the hooks
-            wired up automatically. If <code>gcv</code> isn't installed, the
-            hook prints a warning and exits cleanly — it never breaks the
-            workflow.
+            <code>gcv changelog</code> prints to stdout — it does not write a
+            file. Use it to preview, pipe, or compose. <code>gcv bump</code> is
+            what writes <code>CHANGELOG.md</code>.
+          </p>
+          <pre><code><span class="comment"># Preview unreleased commits</span>
+gcv changelog
+
+<span class="comment"># Preview from a specific tag</span>
+gcv changelog --from v1.2.0
+
+<span class="comment"># Pipe to clipboard</span>
+gcv changelog | pbcopy
+
+<span class="comment"># Write to a release notes file manually</span>
+gcv changelog > RELEASE_NOTES.md</code></pre>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Flag</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>--from &lt;tag&gt;</td>
+                  <td>Start range from a specific git tag or commit</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Only conventional commits appear in the output — non-conventional
+            commits are silently excluded.
           </p>
         </div>
 
-        <div class="doc-section">
-          <h3>Init — set up a team config</h3>
+        <!-- Bump -->
+        <div class="doc-section" id="ref-bump">
+          <h3>Bump</h3>
           <p>
-            Run <code>gcv init</code> to scaffold a <code>.gc.json</code> in the
-            current directory. Commit this file so the whole team shares the
-            same types, scopes, and branch rules.
+            Requires a clean working tree. Reads commits since the last tag,
+            infers the semver bump type, generates the changelog, updates
+            <code>package.json</code>, commits, and tags — in one step.
+          </p>
+          <pre><code><span class="comment"># Auto-detect bump type from commits</span>
+gcv bump
+<span class="cmd-output">Bumped 1.3.0 → 1.4.0 (minor)
+Tagged v1.4.0</span>
+
+<span class="comment"># Override bump type manually</span>
+gcv bump --major
+gcv bump --minor
+gcv bump --patch
+
+<span class="comment"># Preview what would happen — no files written</span>
+gcv bump --dry-run
+<span class="cmd-output">Detected: minor
+Current:  1.3.0
+Next:     1.4.0
+
+--dry-run: no files written, no commit, no tag.</span>
+
+<span class="comment"># Bump and changelog — skip tagging</span>
+gcv bump --no-tag</code></pre>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Flag</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>--major</td>
+                  <td>Force a major bump</td>
+                </tr>
+                <tr>
+                  <td>--minor</td>
+                  <td>Force a minor bump</td>
+                </tr>
+                <tr>
+                  <td>--patch</td>
+                  <td>Force a patch bump</td>
+                </tr>
+                <tr>
+                  <td>--dry-run</td>
+                  <td>Print detected type and next version — no changes made</td>
+                </tr>
+                <tr>
+                  <td>--no-tag</td>
+                  <td>Skip git tag creation</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Bump type is inferred from commits: <code>feat</code> → minor ·
+            <code>fix</code> / <code>chore</code> / others → patch · breaking
+            change footer → major.
+          </p>
+          <p>
+            If <code>CHANGELOG.md</code> doesn't exist when you first run
+            <code>gcv bump</code>, it generates the full commit history before
+            prepending the new release — no setup needed on a greenfield repo.
+          </p>
+        </div>
+
+        <!-- Init -->
+        <div class="doc-section" id="ref-init">
+          <h3>Init</h3>
+          <p>
+            Scaffolds a <code>.gc.json</code> in the current directory through
+            an interactive prompt. Commit this file so the whole team shares the
+            same configuration.
           </p>
           <pre><code>gcv init</code></pre>
+          <p>The prompt walks through:</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Step</th>
+                  <th>What it does</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Commit types</td>
+                  <td>Use conventional commit defaults or define your own</td>
+                </tr>
+                <tr>
+                  <td>Scopes</td>
+                  <td>Add scope names with optional team prefixes</td>
+                </tr>
+                <tr>
+                  <td>Branch conventions</td>
+                  <td>Add branch patterns and allowed types (optional)</td>
+                </tr>
+                <tr>
+                  <td>Git hooks</td>
+                  <td>Install <code>post-checkout</code> for branch validation (optional)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <p>
-            If you're not at the repo root, committy warns you before writing.
-            If <code>.gc.json</code> already exists, it asks before overwriting.
-            v0.2 adds two new optional steps: branch config and hook
-            installation.
+            If <code>.gc.json</code> already exists, init asks before
+            overwriting. If you're not at the repo root, it warns you before
+            writing.
           </p>
         </div>
 
-        <div class="doc-section">
-          <h3>Config reference</h3>
+        <!-- Config -->
+        <div class="doc-section" id="ref-config">
+          <h3>Config — .gc.json</h3>
           <p>
-            <code>.gc.json</code> is optional. When present it must be valid
-            JSON — malformed config prints an error and exits. No silent
+            Optional. committy walks up from your current directory to find the
+            nearest config. Malformed JSON prints an error and exits — no silent
             fallback.
           </p>
           <pre><code>{
   "types": ["feat", "fix", "chore", "docs", "refactor", "test"],
   "scopes": [
-    { "name": "auth", "team": "PCUST" },
-    { "name": "payment", "team": "PCUST" },
-    { "name": "dashboard", "team": "PINT" },
+    { "name": "api",  "team": "BACKEND" },
+    { "name": "web",  "team": "FRONTEND" },
     { "name": "deps" }
   ],
   "branches": {
@@ -861,7 +891,6 @@ gcv branch validate feat/add-login-page</code></pre>
     "types": ["feat", "fix", "hotfix", "release", "chore"]
   }
 }</code></pre>
-
           <div class="table-wrap">
             <table>
               <thead>
@@ -883,7 +912,7 @@ gcv branch validate feat/add-login-page</code></pre>
                   <td>scopes</td>
                   <td>object[]</td>
                   <td>Yes</td>
-                  <td>List of scope definitions (can be empty [])</td>
+                  <td>Scope definitions — can be empty <code>[]</code></td>
                 </tr>
                 <tr>
                   <td>scopes[].name</td>
@@ -895,21 +924,25 @@ gcv branch validate feat/add-login-page</code></pre>
                   <td>scopes[].team</td>
                   <td>string</td>
                   <td>No</td>
-                  <td>Team prefix inserted before the message</td>
+                  <td>
+                    Prefix inserted before the commit message — e.g.
+                    <code>feat(api): BACKEND message</code>
+                  </td>
                 </tr>
                 <tr>
                   <td>branches</td>
                   <td>object</td>
                   <td>No</td>
-                  <td>Branch naming config — omit to skip branch validation</td>
+                  <td>Omit to skip branch validation entirely</td>
                 </tr>
                 <tr>
                   <td>branches.allowed</td>
                   <td>string[]</td>
                   <td>Yes*</td>
                   <td>
-                    Patterns using <code>{type}</code>, <code>{ticket}</code>,
-                    <code>{description}</code> placeholders
+                    Patterns using <code>{type}</code>,
+                    <code>{ticket}</code>, <code>{description}</code>
+                    placeholders
                   </td>
                 </tr>
                 <tr>
@@ -924,161 +957,21 @@ gcv branch validate feat/add-login-page</code></pre>
             </table>
           </div>
           <p>
-            * Required when <code>branches</code> is present. Placeholder rules:
-            <code>{type}</code> matches values from <code>branches.types</code>;
-            <code>{ticket}</code> matches <code>PROJ-123</code> format;
-            <code>{description}</code> matches kebab-case words.
+            * Required when <code>branches</code> is present. Placeholder
+            rules: <code>{type}</code> matches values from
+            <code>branches.types</code>; <code>{ticket}</code> matches
+            <code>PROJ-123</code> format; <code>{description}</code> matches
+            kebab-case words.
           </p>
-
           <p>
-            Scope names must be unique. Scopes without <code>team</code> produce
-            no prefix.
-          </p>
-
-          <p>
-            When a scope has a <code>team</code> value, the commit message
-            becomes:
-          </p>
-          <pre><code>type(scope): TEAM message
-
-<span class="comment"># Example with { "name": "auth", "team": "PCUST" }:</span>
-<span class="cmd-output">feat(auth): PCUST fix svg images not loading</span></code></pre>
-        </div>
-
-        <div class="doc-section">
-          <h3>Changelog</h3>
-          <p>
-            Run <code>gcv changelog</code> to generate a
-            <code>CHANGELOG.md</code> from your commit history. By default it
-            generates from the last git tag to HEAD and prepends to any existing
-            changelog.
-          </p>
-          <pre><code><span class="comment"># Generate from last tag → HEAD</span>
-gcv changelog
-
-<span class="comment"># Generate from a specific tag</span>
-gcv changelog --from v0.1.0
-
-<span class="comment"># Regenerate the full history</span>
-gcv changelog --all
-
-<span class="comment"># Preview without writing</span>
-gcv changelog --dry-run</code></pre>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Flag</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>--from &lt;tag&gt;</td>
-                  <td>Start range from a specific git tag or commit</td>
-                </tr>
-                <tr>
-                  <td>--all</td>
-                  <td>Regenerate the entire changelog from all commits</td>
-                </tr>
-                <tr>
-                  <td>--dry-run</td>
-                  <td>Print output to stdout — no file written</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p>
-            Uses the Conventional Commits preset. Only commits that follow the
-            convention appear in the output — non-conventional commits are
-            silently excluded.
+            Default types when no config is present:
+            <code>feat fix chore docs refactor test style perf ci build revert</code>
           </p>
         </div>
 
-        <div class="doc-section">
-          <h3>Bump</h3>
-          <p>
-            Run <code>gcv bump</code> to release a new version. It reads commits
-            since the last tag, determines the semver bump type, generates the
-            changelog, updates <code>package.json</code>, commits the release,
-            and creates a git tag — in one command.
-          </p>
-          <pre><code><span class="comment"># Auto-detect bump type from commits</span>
-gcv bump
-<span class="cmd-output">Bumped 0.3.0 → 0.4.0 (minor)
-Tagged v0.4.0</span>
-
-<span class="comment"># Override bump type manually</span>
-gcv bump --major
-gcv bump --minor
-gcv bump --patch
-
-<span class="comment"># Preview what would happen — no files written</span>
-gcv bump --dry-run
-<span class="cmd-output">Detected: minor
-Current:  0.2.0
-Next:     0.3.0
-
---dry-run: no files written, no commit, no tag.</span>
-
-<span class="comment"># Bump and generate changelog without tagging</span>
-gcv bump --no-tag</code></pre>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Flag</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>--major</td>
-                  <td>Force a major bump regardless of commit history</td>
-                </tr>
-                <tr>
-                  <td>--minor</td>
-                  <td>Force a minor bump</td>
-                </tr>
-                <tr>
-                  <td>--patch</td>
-                  <td>Force a patch bump</td>
-                </tr>
-                <tr>
-                  <td>--dry-run</td>
-                  <td>
-                    Print detected type and next version — no changes made
-                  </td>
-                </tr>
-                <tr>
-                  <td>--no-tag</td>
-                  <td>Skip git tag creation</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p>
-            The working tree must be clean before running <code>gcv bump</code>.
-            If <code>package.json</code> is present, the version field is
-            updated automatically. The bump type is inferred from commits:
-            <code>feat</code> → minor, <code>fix</code> / <code>chore</code> /
-            others → patch, breaking change footer → major.
-          </p>
-        </div>
-
-        <div class="doc-section">
-          <h3>Default types</h3>
-          <p>
-            Used when no config is present. Follows
-            <a href="https://www.conventionalcommits.org/" target="_blank"
-              >Conventional Commits v1.0.0</a
-            >.
-          </p>
-          <pre><code>feat  fix  chore  docs  refactor  test  style  perf  ci  build  revert</code></pre>
-        </div>
-
-        <div class="doc-section">
-          <h3>Command reference</h3>
+        <!-- All commands -->
+        <div class="doc-section" id="ref-commands">
+          <h3>All commands</h3>
           <div class="table-wrap">
             <table>
               <thead>
@@ -1102,13 +995,11 @@ gcv bump --no-tag</code></pre>
                 </tr>
                 <tr>
                   <td>gcv branch &lt;name&gt;</td>
-                  <td>
-                    Inline branch create — validates then runs git switch -c
-                  </td>
+                  <td>Inline branch create — validates then runs git switch -c</td>
                 </tr>
                 <tr>
                   <td>gcv branch validate &lt;name&gt;</td>
-                  <td>Validate a branch name against config — exits 0 or 1</td>
+                  <td>Validate a branch name — exits 0 or 1</td>
                 </tr>
                 <tr>
                   <td>gcv init</td>
@@ -1116,25 +1007,15 @@ gcv bump --no-tag</code></pre>
                 </tr>
                 <tr>
                   <td>gcv changelog</td>
-                  <td>Generate CHANGELOG.md from commits since last tag</td>
+                  <td>Print unreleased commits to stdout</td>
                 </tr>
                 <tr>
                   <td>gcv changelog --from &lt;tag&gt;</td>
-                  <td>Generate from a specific tag</td>
-                </tr>
-                <tr>
-                  <td>gcv changelog --all</td>
-                  <td>Regenerate full history</td>
-                </tr>
-                <tr>
-                  <td>gcv changelog --dry-run</td>
-                  <td>Preview output without writing</td>
+                  <td>Print from a specific tag</td>
                 </tr>
                 <tr>
                   <td>gcv bump</td>
-                  <td>
-                    Auto-detect semver bump, write changelog, commit, and tag
-                  </td>
+                  <td>Auto-detect semver, write changelog, commit, tag</td>
                 </tr>
                 <tr>
                   <td>gcv bump --major/--minor/--patch</td>
@@ -1142,11 +1023,11 @@ gcv bump --no-tag</code></pre>
                 </tr>
                 <tr>
                   <td>gcv bump --dry-run</td>
-                  <td>Preview bump without making any changes</td>
+                  <td>Preview bump — no changes made</td>
                 </tr>
                 <tr>
                   <td>gcv bump --no-tag</td>
-                  <td>Bump and changelog without creating a git tag</td>
+                  <td>Bump and changelog without git tag</td>
                 </tr>
                 <tr>
                   <td>gcv --help / -h</td>
@@ -1160,6 +1041,7 @@ gcv bump --no-tag</code></pre>
             </table>
           </div>
         </div>
+
       </div>
     </section>
 
@@ -1168,11 +1050,27 @@ gcv bump --no-tag</code></pre>
       <div class="container">
         <p>
           MIT License ·
-          <a href="https://github.com/hussmarsidi/committy" target="_blank"
-            >github.com/hussmarsidi/committy</a
+          <a href="https://github.com/HussMarsidi/committy" target="_blank"
+            >github.com/HussMarsidi/committy</a
           >
         </p>
       </div>
     </footer>
+
+    <script>
+      const tabBtns = document.querySelectorAll(".tab-btn");
+      const tabPanes = document.querySelectorAll(".tab-pane");
+
+      tabBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          tabBtns.forEach((b) => b.classList.remove("active"));
+          tabPanes.forEach((p) => p.classList.remove("active"));
+          btn.classList.add("active");
+          document
+            .getElementById("tab-" + btn.dataset.tab)
+            .classList.add("active");
+        });
+      });
+    </script>
   </body>
 </html>
