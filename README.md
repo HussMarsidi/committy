@@ -103,9 +103,7 @@ gcv init
 
 Walks you through creating `.gc.json` in the current directory. Commit this file so the whole team shares the same types, scopes, and branch rules.
 
-v0.2 adds two optional init steps: branch naming config and git hook installation. committy detects whether Husky is present and adapts — no manual hook wiring needed.
-
-If you're not at the repo root, committy warns you before writing.
+committy detects whether Husky is present and adapts — no manual hook wiring needed. If you're not at the repo root, it warns you before writing.
 
 ### Preview or bootstrap a changelog
 
@@ -148,9 +146,8 @@ Nothing to do. committy walks up from your current directory to the repo root lo
 {
   "types": ["feat", "fix", "chore", "docs", "refactor", "test"],
   "scopes": [
-    { "name": "auth", "team": "PCUST" },
-    { "name": "payment", "team": "PCUST" },
-    { "name": "dashboard", "team": "PINT" },
+    { "name": "api",  "team": "BACKEND" },
+    { "name": "web",  "team": "FRONTEND" },
     { "name": "deps" }
   ],
   "branches": {
@@ -165,7 +162,7 @@ Nothing to do. committy walks up from your current directory to the repo root lo
 | `types`              | `string[]` | Yes      | Non-empty list of allowed commit types                   |
 | `scopes`             | `object[]` | Yes      | List of scope definitions (can be empty `[]`)            |
 | `scopes[].name`      | `string`   | Yes      | Scope identifier used in commits                         |
-| `scopes[].team`      | `string`   | No       | Team prefix inserted before the message                  |
+| `scopes[].team`      | `string`   | No       | Prefix inserted before the message — e.g. `BACKEND`     |
 | `branches`           | `object`   | No       | Branch naming config — omit to skip branch validation    |
 | `branches.allowed`   | `string[]` | Yes*     | Patterns using `{type}`, `{ticket}`, `{description}`     |
 | `branches.types`     | `string[]` | Yes*     | Allowed values for the `{type}` placeholder              |
@@ -178,17 +175,19 @@ Scope names must be unique. Scopes without `team` produce no prefix.
 
 ### Team prefix
 
-When a scope has a `team` value, the commit message becomes:
+When a scope has a `team` value, the prefix is inserted before the commit message:
 
 ```
 type(scope): TEAM message
 ```
 
-Example with `{ "name": "auth", "team": "PCUST" }`:
+Example with `{ "name": "api", "team": "BACKEND" }`:
 
 ```
-feat(auth): PCUST fix svg images not loading
+feat(api): BACKEND add rate limiting
 ```
+
+Useful when downstream tooling (Jira, Linear, Slack integrations) parses commit messages by team. Scopes without a `team` value produce no prefix.
 
 ### Config resolution
 
@@ -256,6 +255,8 @@ Previews changelog markdown on stdout. Only commits following the Conventional C
 Auto-detects the semver bump type from commits since the last tag, generates the changelog, bumps `package.json` (if present), commits, and creates a git tag. If `CHANGELOG.md` does not exist, full tagged history is written first, then the new release section is prepended — no extra flags or setup step.
 
 Bump type inference: `feat` → minor, `fix` / `chore` / others → patch, breaking change footer → major.
+
+The release commit follows conventional commits format — `chore(release): v1.4.0` — so it won't surface as a feature or fix in your next changelog.
 
 Working tree must be clean before running.
 
